@@ -1,0 +1,16 @@
+{
+  "macos/Source/Payload/engine/Setup_Local_Audio.command": "a588f17eb58e864837f6496f0402a4baff54c0036c6e79400bb283e83da68dfc",
+  "macos/Source/Payload/engine/tools/music.py": "661a81d31017c7abbaf39ae7ad5eaeb113838c044f574293589ea9aff17ec83f",
+  "macos/Source/Payload/engine/tools/gui_process.py": "960cf688bdf36206f0228bd84b29a34baefa42b08a5a14e7d9c4ff00fd75932a",
+  "macos/Source/Payload/engine/tools/cut_settings.py": "1e5ae5a9cd5541b52a54fa892842a33c75273053e70195c118e15a7e7026801e",
+  "macos/Source/Payload/engine/tools/process.py": "ee4fffca70ac1f9a38408b1d7c86e0eb805075e23108aa19e24a2d95a1ec302f",
+  "macos/Source/Payload/engine/tools/requirements-music.txt": "ba147c48d563502a64fe645defb8e869d7bb77abc4b17f53c104b4a9b859199e",
+  "windows/app/tools/music.py": "00cfb10b36de8ed5ab492a04695bd2aa7b7a270496bcb552838bc94d787f6316",
+  "windows/app/tools/gui_process.py": "f5c44dc0535382dd396572035fd1a7c153e9b5de04613dcefbf9a5e9bc13bf1f",
+  "windows/app/tools/cut_settings.py": "1e5ae5a9cd5541b52a54fa892842a33c75273053e70195c118e15a7e7026801e",
+  "windows/app/tools/process.py": "f20d6353e25fd0ebc67e7caccffd98866c9f84780d5e396fc33412131c11f67a",
+  "windows/app/paths.py": "2d2a2ab91c33a4df73d4490e37ac018e3b3690fcdb2ae01f1a652efe5827d9f4",
+  "windows/app/bootstrap.py": "52837cef213e3112bc6920a8509062a55fe8c451fdc5872988208e0612127b20",
+  "windows/app/install.py": "cfbf49aa73cac4648255f68f07d8565d4034ecfb4c2bf7834cc3546e2f2bf962",
+  "windows/app/launcher.py": "d7d32b2702f68276b2faf8dd81aa654d681713ad5457d9625084748b265aa8ee"
+}
