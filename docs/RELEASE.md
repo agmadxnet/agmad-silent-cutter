@@ -1,6 +1,11 @@
 # Release preparation — 1.4.0
 
-Prepared locally for owner review. Proposed repository: `agmadxnet/agmad-silent-cutter`; public creation/push/release and agmad.net deployment have not occurred. The GitHub connector currently lists no accessible repositories; no credentials are stored in source. Confirm access and the exact destination before publication.
+Public repository and pre-release approved and published on 20 October 2026:
+
+- https://github.com/agmadxnet/agmad-silent-cutter
+- https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0
+
+All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, while native Windows visual confirmation and the production website rollout remain pending.
 
 ## Prepared
 
