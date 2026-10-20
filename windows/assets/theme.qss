@@ -1,0 +1,19 @@
+/* AGMAD studio palette. No fonts, images or styles fetched at runtime. */
+QWidget {background:#060708;color:#f2f3f6;font-family:"Segoe UI","Helvetica Neue",sans-serif;font-size:13px;}
+QLabel {background:transparent;}
+QLabel#Brand {color:#afb6c5;font-size:10px;letter-spacing:1px;}
+QLabel#Title {font-size:26px;font-weight:300;padding-bottom:2px;}
+QPushButton,QComboBox,QSpinBox,QDoubleSpinBox,QLineEdit {background:#13171e;border:1px solid #353e4e;border-radius:8px;padding:4px 7px;color:#f2f3f6;selection-background-color:#c6d4ff;selection-color:#060708;}
+QPushButton:hover,QComboBox:hover {background:#202631;border-color:#8795b1;}
+QPushButton:checked {background:#c6d4ff;color:#060708;border-color:#c6d4ff;}
+QPushButton#Primary {background:#e6ebff;color:#060708;font-weight:600;padding:8px 20px;}
+QPushButton#Primary:hover {background:#ffffff;}
+QPushButton:disabled,QComboBox:disabled,QSpinBox:disabled,QDoubleSpinBox:disabled {color:#7d8596;border-color:#232a35;background:#0e1117;}
+QPushButton#Primary:disabled {background:#252c39;color:#9ba5b9;}
+QLineEdit:focus,QComboBox:focus,QSpinBox:focus,QDoubleSpinBox:focus,QPushButton:focus {border:1px solid #c6d4ff;}
+QVideoWidget {background:#000000;border:1px solid #353e4e;border-radius:12px;}
+QProgressBar {background:#13171e;border:0;border-radius:4px;}
+QProgressBar::chunk {background:#c6d4ff;border-radius:4px;}
+QSlider::groove:horizontal {height:4px;background:#303846;border-radius:2px;}
+QSlider::handle:horizontal {background:#c6d4ff;width:12px;margin:-5px 0;border-radius:6px;}
+QToolTip {background:#202631;color:#f2f3f6;border:1px solid #8795b1;padding:6px;}
