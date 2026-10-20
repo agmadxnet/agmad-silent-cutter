@@ -1,0 +1,13 @@
+{
+  "version": "1.4.0",
+  "status": "candidate",
+  "published": false,
+  "repository": null,
+  "productPath": "/projects/silent-cutter/",
+  "assets": {
+    "macos": null,
+    "windows": null,
+    "source": null,
+    "checksums": null
+  }
+}
