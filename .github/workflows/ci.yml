@@ -1,0 +1,32 @@
+name: Source and native builds
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+  mac-build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash macos/Source/build.command
+      - run: codesign --verify --deep --strict 'macos/Agmad Silent Cutter.app'
+  windows-runtime:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/package_windows.py --output build
+      - shell: pwsh
+        run: |
+          $runtime = 'build/Agmad_Silent_Cutter_Windows_1.4.0/runtime/python.exe'
+          & $runtime -c "from PySide6.QtWidgets import QApplication; from PySide6.QtMultimedia import QMediaPlayer; print('Qt imports passed')"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
