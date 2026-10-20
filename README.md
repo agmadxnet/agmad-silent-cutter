@@ -4,7 +4,7 @@ Local video silence cutting for macOS and Windows. Choose a video, tune its paci
 
 ![AGMAD Silent Cutter on Mac](docs/screenshots/macos.png)
 
-**1.4.0 release candidate · 20 October 2026.** The owner reports both 1.3 versions working well on their Mac and Windows devices. This candidate adds coordinated AGMAD styling, original icons, source packaging and release documentation. It keeps the working processing engine and settings. See [validation](docs/VALIDATION.md) for evidence and limits. It has not yet been publicly released.
+**1.4.0 release candidate · 20 October 2026.** The owner reports both 1.3 versions working well on their Mac and Windows devices. This candidate adds coordinated AGMAD styling, original icons, source packaging and release documentation. It keeps the working processing engine and settings. See [validation](docs/VALIDATION.md) for evidence and limits. It is now available as a [public pre-release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0); the stable release and website rollout remain separate.
 
 ## Get started
 
@@ -13,7 +13,13 @@ Local video silence cutting for macOS and Windows. Choose a video, tune its paci
 | Mac | Apple Silicon, macOS 14+, Homebrew for initial tools setup | [English guide](docs/MAC.md) |
 | Windows | Intel/AMD 64-bit Windows; bundled Python/Qt | [دليل Windows بالعربية](docs/WINDOWS.ar.md) |
 
-Release installers belong in GitHub Releases, not the source repository. Until publication, use the prepared local release files. Download links will be enabled on the existing [AGMAD product page](https://agmad.net/projects/silent-cutter/) after the release is approved and uploaded.
+Download the verified [1.4.0 pre-release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0):
+
+- [Mac DMG](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Mac_1.4.0.dmg)
+- [Windows ZIP](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Windows_1.4.0.zip)
+- [Source archive](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Source_1.4.0.zip) · [SHA256SUMS](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/SHA256SUMS)
+
+All seven attached assets were re-downloaded and matched the approved local SHA-256 values. The [AGMAD product page](https://agmad.net/projects/silent-cutter/) rollout is still pending; these GitHub downloads are available now. The source archive/tag records the reviewed build snapshot; this branch can contain later documentation updates.
 
 1. Select a video and output destination.
 2. Start with level **0**, a **30-second test**, and audio cleanup **Off**.

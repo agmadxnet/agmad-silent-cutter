@@ -10,11 +10,19 @@
 - Bilingual product-page preview, 320/390/768/1280px layout audit and narrowly scoped existing-site overlay.
 - Mac DMG/ZIP and Windows ZIP assembled; release/source assets CRC/hash verified in the adjacent release folder.
 
-## Pending external publication
+## Published on GitHub
 
-- Owner review of the styled candidate and its prepared MIT license/repository destination.
+- Public repository: https://github.com/agmadxnet/agmad-silent-cutter
+- MIT application source: all 78 reviewed files matched public Git blobs before tagging.
+- Public pre-release: https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0
+- Tag/source commit: 0553f6eeb949cf4763cac91451642f90092d2619.
+- Seven release assets re-downloaded and SHA-256/size verified against the approved local files.
+- CI workflow submitted; results are tracked separately, not implied by download verification.
+
+## Pending
+
 - Final native Windows visual check for 1.4.0; existing 1.3 workflow is owner-confirmed.
-- GitHub repository access/publication, remote CI execution, tag and public release assets.
-- Verified public download URLs and approval/deployment of only the existing Silent Cutter project page updates.
+- Production website page/download integration and its approval/deployment.
+- Developer ID/notarization or Windows publisher signing if a future distribution requires them.
 
-No GitHub repository was created, no source or installer was uploaded publicly, and no production website change was made. Developer ID/notarization and Windows publisher signing are not implemented; they are disclosed rather than implied by the term release.
+No production website change was made. Main-branch documentation may advance after the immutable reviewed release tag/source archive.
