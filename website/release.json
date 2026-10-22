@@ -1,13 +1,16 @@
 {
   "version": "1.4.0",
-  "status": "candidate",
-  "published": false,
-  "repository": null,
+  "status": "stable",
+  "published": true,
+  "repository": "https://github.com/agmadxnet/agmad-silent-cutter",
   "productPath": "/projects/silent-cutter/",
   "assets": {
-    "macos": null,
-    "windows": null,
-    "source": null,
-    "checksums": null
-  }
+    "macos": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Mac_1.4.0.dmg",
+    "windows": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Windows_1.4.0.zip",
+    "source": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/Agmad_Silent_Cutter_Source_1.4.0.zip",
+    "checksums": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.4.0/SHA256SUMS"
+  },
+  "websiteDeployed": true,
+  "stableApproved": "2026-10-22",
+  "windowsAcceptance": "Owner confirmed Medhat completed Windows 1.4.0 test on 2026-10-22"
 }
