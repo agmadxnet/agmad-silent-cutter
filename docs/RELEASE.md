@@ -5,7 +5,7 @@ Public repository and pre-release approved and published on 20 October 2026:
 - https://github.com/agmadxnet/agmad-silent-cutter
 - https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0
 
-All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, and the bilingual production website rollout completed on 20 October 2026. Native Windows visual confirmation remains pending. See [website deployment](WEBSITE_RELEASE.md).
+All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, and the bilingual production website rollout completed on 20 October 2026. The owner confirmed Medhat completed the requested Windows 1.4.0 test on 22 October 2026. See [website deployment](WEBSITE_RELEASE.md).
 
 ## Prepared
 
@@ -19,7 +19,7 @@ All 78 source files matched the reviewed local Git blobs before tagging. Seven p
 ## Final review before sharing
 
 1. Review the visual change and prepared MIT source license. Confirm the repository owner/name and whether source should be public; third-party licenses remain independent.
-2. Test a short normal recording with the styled Mac and Windows packages. The owner already accepted the 1.3 workflow; a new Windows visual/native check is still needed after styling.
+2. Test a short normal recording with the styled Mac and Windows packages. The owner already accepted the 1.3 workflow; Medhat's requested Windows 1.4.0 test was confirmed complete by the owner on 22 October 2026.
 3. Review version, minimum OS, optional download sizes/signing disclosures, LICENSES and source links. No Developer ID, notarization or Windows publisher signature is claimed. If a signed mainstream distribution is required, complete the owner's signing setup before release.
 4. Freeze exact artifact SHA-256 and file sizes from RELEASE_MANIFEST.json. Upload only those installers, source archive and SHA256SUMS; never upload the workspace or installed environments/models.
 5. Publish the reviewed repository and a GitHub release. Use the app source tag `v1.4.0` only for the reviewed commit; do not assume locally built artifacts are automatically reproducible bit-for-bit.
@@ -32,3 +32,5 @@ Rollback: retain previous 1.3 DMG/ZIP and the pre-deployment project templates/c
 ## GitHub checks reviewed 22 October 2026
 
 [Latest reviewed run](https://github.com/agmadxnet/agmad-silent-cutter/actions/runs/39464427700): source regression tests and native Mac build/signature verification passed. The Windows job was cancelled before execution because GitHub could not acquire a hosted runner. This is not a passed Windows check; rerun it when runner capacity is available. No installer or release tag was changed.
+
+Stable promotion approved by the owner on 22 October 2026 after Medhat’s Windows test. Existing tested installers, release tag, checksums and attached build-time records remain unchanged. Current documentation records later acceptance; attached source/validation/manifest files retain their historical build-time state.

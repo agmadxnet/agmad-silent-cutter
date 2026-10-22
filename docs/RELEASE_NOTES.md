@@ -8,4 +8,6 @@ Mac: Apple Silicon, macOS 14+, initial Homebrew tools setup. Windows: Intel/AMD 
 
 Installation: quit the old app; replace the Mac app in Applications or extract the Windows ZIP and run Install.cmd. Review a 30-second clip before processing a lecture.
 
-This candidate is ad-hoc signed on Mac and not publisher-signed on Windows. The owner reports both 1.3 platforms working; 1.4.0 native Mac and cross-platform render checks passed. Fresh Windows visual confirmation and broader device testing are still needed. See the validation guide and SHA256SUMS shipped with the release assets. Source/application license: MIT; third-party components retain their licenses.
+This release is ad-hoc signed on Mac and not publisher-signed on Windows. The owner reports both 1.3 platforms working; 1.4.0 native Mac and cross-platform render checks passed. Medhat’s Windows 1.4.0 test was confirmed complete by the owner on 22 October 2026; broader device testing remains limited. See the validation guide and SHA256SUMS shipped with the release assets. Source/application license: MIT; third-party components retain their licenses.
+
+Promoted to stable on 22 October 2026 with owner approval. Tested binaries and tag unchanged.

@@ -10,4 +10,6 @@ Seven narrowly scoped WordPress plugin files were updated: both product template
 
 Verification: all seven saved editor sources matched the prepared files; both anonymous language pages returned HTTP 200 and correct download links; language switching, desktop layout, Arabic 390px phone layout and app screenshot decoding passed. Download assets had already been downloaded and checksum-verified against the reviewed release.
 
-Limits: Mac is ad-hoc signed and not Apple-notarized; Windows has no publisher signature. Native Windows 1.4 visual confirmation and broad device testing remain open. The image server labels the AVIF preview as text/plain; the tested browser decoded it successfully. No global media or server configuration was changed.
+Limits: Mac is ad-hoc signed and not Apple-notarized; Windows has no publisher signature. The owner confirmed Medhat completed the requested Windows 1.4.0 test on 22 October 2026. Broad device testing remains open. The image server labels the AVIF preview as text/plain; the tested browser decoded it successfully. No global media or server configuration was changed.
+
+Stable promotion approved by the owner on 22 October 2026 after Medhat’s Windows test. Existing tested installers, release tag, checksums and attached build-time records remain unchanged. Current documentation records later acceptance; attached source/validation/manifest files retain their historical build-time state.

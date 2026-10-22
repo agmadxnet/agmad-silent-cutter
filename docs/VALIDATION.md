@@ -1,8 +1,10 @@
-# Validation — 1.4.0 candidate, 20 October 2026
+# Validation — 1.4.0, updated 22 October 2026
 
 ## Owner confirmation
 
 On 20 October 2026 the owner reported checking both existing Mac and Windows versions and that both work well. This is user-reported acceptance of the 1.3 workflow on their devices. Detailed Windows OS/hardware, individual mode results and long-recording benchmarks were not supplied. It is not a claim of broad compatibility or native testing of the new 1.4.0 styling.
+
+On 22 October 2026 the owner confirmed that Medhat completed the requested Windows 1.4.0 test. This closes the requested native Windows acceptance check as user-reported evidence. OS/hardware details, individual mode results and benchmarks were not supplied; no broader test coverage is inferred.
 
 ## Checks performed for 1.4.0
 
@@ -20,8 +22,10 @@ On 20 October 2026 the owner reported checking both existing Mac and Windows ver
 
 Windows retains the existing official CPython 3.13.16 / Qt/PySide/Shiboken 6.8.3 / pip 26.2.1 runtime. All retained runtime files are verified by SHA-256. Core/music setup locks and installer/data locations are unchanged. Runtime license texts/notices travel with the package. ZIP CRCs and final release SHA-256 are checked during packaging; exact artifacts are recorded in the adjacent RELEASE_MANIFEST.json / SHA256SUMS.
 
-CI definitions are included but have not been run on GitHub yet. Local validation is not represented as remote CI success. Fresh native Windows installation, current new styling, Defender handling and setup downloads still need a final check on a Windows device. Fresh end-user Mac setup uses Homebrew's current formula, so its dependency version may differ from the existing tested installation; capture versions in support logs if setup differs.
+GitHub source tests and native Mac build/signature checks passed in run 39464427700. Its Windows job could not acquire a hosted runner and did not execute; Medhat's manual acceptance is separate evidence. Fresh end-user Mac setup uses Homebrew's current formula, so its dependency version may differ from the existing tested installation; capture versions in support logs if setup differs.
 
 ## Remaining limits
 
-No Intel Mac, Windows ARM/32-bit, physical phone website test, Windows VM, broad GPU/codec matrix, formal accessibility certification, security audit, signed publisher identity or Apple notarization. Real speech, accents, heavy music, wind, HDR and long lectures require practical output review. No new performance or speech-preservation guarantee is claimed. The website overlay still needs validation against current production bytes before deployment. Public source and the pre-release are now active: https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0. Seven public release assets were re-downloaded and hash-verified. Production website rollout remains pending.
+No Intel Mac, Windows ARM/32-bit, physical phone website test, Windows VM, broad GPU/codec matrix, formal accessibility certification, security audit, signed publisher identity or Apple notarization. Real speech, accents, heavy music, wind, HDR and long lectures require practical output review. No new performance or speech-preservation guarantee is claimed. The bilingual product pages and project badges were deployed and verified on 20 October 2026; see WEBSITE_RELEASE.md. Public source and the pre-release are now active: https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0. Seven public release assets were re-downloaded and hash-verified. The owner approved stable promotion on 22 October 2026 after confirming Medhat’s Windows test.
+
+Stable promotion approved by the owner on 22 October 2026 after Medhat’s Windows test. Existing tested installers, release tag, checksums and attached build-time records remain unchanged. Current documentation records later acceptance; attached source/validation/manifest files retain their historical build-time state.
