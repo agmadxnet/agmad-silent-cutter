@@ -5,7 +5,7 @@ Public repository and pre-release approved and published on 20 October 2026:
 - https://github.com/agmadxnet/agmad-silent-cutter
 - https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0
 
-All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, while native Windows visual confirmation and the production website rollout remain pending.
+All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, and the bilingual production website rollout completed on 20 October 2026. Native Windows visual confirmation remains pending. See [website deployment](WEBSITE_RELEASE.md).
 
 ## Prepared
 
@@ -28,3 +28,7 @@ All 78 source files matched the reviewed local Git blobs before tagging. Seven p
 8. Update candidate wording/indexing only after the downloads are live and explicit publication approval is given. Keep other products' release states unchanged.
 
 Rollback: retain previous 1.3 DMG/ZIP and the pre-deployment project templates/content. Replacing the app or restoring the page does not delete result folders or managed engines. Do not remove existing user settings/cache as part of rollback.
+
+## GitHub checks reviewed 22 October 2026
+
+[Latest reviewed run](https://github.com/agmadxnet/agmad-silent-cutter/actions/runs/39464427700): source regression tests and native Mac build/signature verification passed. The Windows job was cancelled before execution because GitHub could not acquire a hosted runner. This is not a passed Windows check; rerun it when runner capacity is available. No installer or release tag was changed.
