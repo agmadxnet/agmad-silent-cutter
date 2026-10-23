@@ -10,10 +10,11 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QComboBox, QSpinBox, QFileDialog, QSlider, QCheckBox, QProgressBar,
-    QMessageBox, QLineEdit, QButtonGroup, QDoubleSpinBox)
+    QMessageBox, QLineEdit, QButtonGroup, QDoubleSpinBox, QScrollArea)
 from paths import ROOT, DATA, prepare
 from tools.cut_settings import resolve, LIMITS
 from tools.process import PRESETS
+from watermark import WatermarkDialog
 
 
 def mapped_time(milliseconds, clips):
@@ -46,11 +47,11 @@ class Player(QWidget):
 class Window(QMainWindow):
     def __init__(self):
         super().__init__(); prepare(); self.setWindowTitle('Agmad Silent Cutter'); self.setWindowIcon(QIcon(str(ROOT/'assets/icon.ico')))
-        screen=QApplication.primaryScreen().availableGeometry();self.resize(min(1160,screen.width()-40),min(780,screen.height()-60)); self.setMinimumSize(900,700); self.setAcceptDrops(True)
+        screen=QApplication.primaryScreen().availableGeometry();self.resize(min(1160,screen.width()-40),min(780,screen.height()-60)); self.setMinimumSize(900,600); self.setAcceptDrops(True)
         self.settings=QSettings('Agmad','SilentCutterWindows'); self.source=None;self.output=None;self.log=None;self.clips=[]
-        self.worker=None;self.cancel_path=None;self.buffer=b'';self.done=False;self.pending_close=False;self.cancelling=False
-        central=QWidget();self.setCentralWidget(central);layout=QVBoxLayout(central);layout.setContentsMargins(20,16,20,16);layout.setSpacing(7)
-        brand=QLabel('A G M A D   /   LOCAL VIDEO TOOLS                                      1.4.0');brand.setObjectName('Brand');layout.addWidget(brand)
+        self.worker=None;self.cancel_path=None;self.buffer=b'';self.done=False;self.pending_close=False;self.cancelling=False;self.watermark_config={}
+        central=QWidget();scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setWidget(central);self.setCentralWidget(scroll);layout=QVBoxLayout(central);layout.setContentsMargins(20,16,20,16);layout.setSpacing(7)
+        brand=QLabel('A G M A D   /   LOCAL VIDEO TOOLS                                      1.5.1 TEST');brand.setObjectName('Brand');layout.addWidget(brand)
         title=QLabel('Agmad Silent Cutter');title.setObjectName('Title');layout.addWidget(title)
         layout.addWidget(QLabel('تنظيف الصوت وقص فترات الصمت محليًا — مع الحفاظ على الملفات الأصلية'))
         self.choose=QPushButton('اختيار فيديو…');self.file=QLineEdit('اختر فيديو أو اسحبه إلى النافذة');self.file.setReadOnly(True)
@@ -60,8 +61,11 @@ class Window(QMainWindow):
         self.destination=Path(self.settings.value('destination',str(Path(videos)/'Agmad Silent Cutter')))
         self.folder.setText(str(self.destination));line=QHBoxLayout();line.addWidget(self.folder_button);line.addWidget(self.folder,1);layout.addLayout(line)
         self.folder_button.clicked.connect(self.select_folder)
+        line=QHBoxLayout();line.addWidget(QLabel('اسم ملف التصدير'));self.filename_style=QComboBox();self.filename_style.addItems(['الاسم الأصلي','التاريخ','التاريخ + الاسم','رقم تسلسلي'])
+        self.filename_style.setCurrentIndex(min(3,max(0,int(self.settings.value('filenameStyle',0)))));line.addWidget(self.filename_style)
+        self.filename_prefix=QLineEdit(str(self.settings.value('filenamePrefix','')));self.filename_prefix.setMaxLength(60);self.filename_prefix.setPlaceholderText('بادئة اختيارية');line.addWidget(self.filename_prefix,1);line.addWidget(QLabel('فيديو MP4 فقط — بدون استبدال الملفات'));layout.addLayout(line)
         self.custom_values=[float(self.settings.value(k,d)) for k,d in [('customThreshold',2),('customPadding',.3),('customPause',.8)]]
-        line=QHBoxLayout();self.profile=QComboBox();self.profile.addItems(['مقياس القص','مخصص']);line.addWidget(self.profile)
+        line=QHBoxLayout();self.profile=QComboBox();self.profile.addItems(['مقياس القص','مخصص','بدون قص']);line.addWidget(self.profile)
         self.levels=QButtonGroup(self);self.level_buttons=[]
         for index,number in enumerate(range(-5,6)):
             b=QPushButton(f'{number:+d}' if number else '0');b.setCheckable(True);b.setFixedWidth(40);self.levels.addButton(b,index);line.addWidget(b);self.level_buttons.append(b)
@@ -72,10 +76,10 @@ class Window(QMainWindow):
         for label,key in [('عتبة الصوت %','threshold'),('هامش الكلام / ثانية','padding'),('أقل صمت / ثانية','pause')]:
             custom_line.addWidget(QLabel(label));field=QDoubleSpinBox();field.setDecimals(3);field.setRange(*LIMITS[key]);field.setSingleStep(.5 if key=='threshold' else .025);custom_line.addWidget(field);self.fields.append(field)
         self.reset_custom=QPushButton('نسخ مستوى المقياس');custom_line.addWidget(self.reset_custom);layout.addWidget(self.custom_panel)
-        self.profile.setCurrentIndex(min(1,max(0,int(self.settings.value('cutProfile',0)))))
+        self.profile.setCurrentIndex(min(2,max(0,int(self.settings.value('cutProfile',0)))))
         self.last_profile=self.profile.currentIndex()
         self.profile.currentIndexChanged.connect(self.profile_changed);self.levels.idClicked.connect(self.refresh_cut_controls)
-        self.advanced.toggled.connect(self.custom_panel.setVisible);self.reset_custom.clicked.connect(self.copy_scale)
+        self.advanced.toggled.connect(self.refresh_cut_controls);self.reset_custom.clicked.connect(self.copy_scale)
         self.refresh_cut_controls();self.advanced.setChecked(self.profile.currentIndex()==1);self.custom_panel.setVisible(self.advanced.isChecked())
         line=QHBoxLayout()
         self.mode=QComboBox();self.mode.addItems(['بدون تنظيف','إزالة الضوضاء','إزالة الموسيقى']);self.mode.setCurrentIndex(min(2,max(0,int(self.settings.value('mode',0)))))
@@ -83,7 +87,9 @@ class Window(QMainWindow):
         self.scope=QComboBox();self.scope.addItems(['الفيديو بالكامل','اختبار 30 ثانية','اختبار 60 ثانية']);line.addWidget(self.scope)
         self.start=QSpinBox();self.start.setRange(0,86400*7);self.start.setEnabled(False);line.addWidget(QLabel('البداية بالثواني'));line.addWidget(self.start)
         self.scope.currentIndexChanged.connect(lambda i:self.start.setEnabled(i>0 and not self.worker));layout.addLayout(line)
-        layout.addWidget(QLabel('−5 ألطف قص • 0 متوازن • +1 إلى +5 نفس المستويات السابقة • القيم الأعلى قد تحذف الكلام الهادئ'))
+        self.cut_hint=QLabel();self.cut_hint.setWordWrap(True);layout.addWidget(self.cut_hint);self.refresh_cut_controls()
+        line=QHBoxLayout();self.watermark_enabled=QCheckBox('إضافة شعار / علامة مائية');line.addWidget(self.watermark_enabled);self.watermark_button=QPushButton('اختيار الشعار وتحديد مكانه…');line.addWidget(self.watermark_button);self.watermark_label=QLabel('بدون علامة مائية');line.addWidget(self.watermark_label,1);layout.addLayout(line)
+        self.watermark_button.clicked.connect(self.edit_watermark);self.watermark_enabled.toggled.connect(self.toggle_watermark)
         players=QHBoxLayout();self.before=Player('قبل التعديل — الأصل');self.after=Player('بعد التعديل');players.addWidget(self.before,1);players.addWidget(self.after,1);layout.addLayout(players,1)
         line=QHBoxLayout();self.link=QCheckBox('ربط المقارنة بالفيديو المعدّل');self.link.setChecked(True);self.link.toggled.connect(self.link_changed);line.addWidget(self.link)
         self.audio=QComboBox();self.audio.addItems(['صوت الأصل','الصوت المعدّل']);self.audio.setCurrentIndex(1);self.audio.currentIndexChanged.connect(self.audio_changed);line.addWidget(self.audio);line.addStretch();layout.addLayout(line)
@@ -107,15 +113,19 @@ class Window(QMainWindow):
     def remember_custom(self):
         self.custom_values=[f.value() for f in self.fields]
     def refresh_cut_controls(self,*args):
+        off=self.profile.currentIndex()==2
+        if hasattr(self,'cut_hint'):self.cut_hint.setText('بدون قص: الاحتفاظ بجميع فترات الصمت. تنظيف الصوت والعلامة المائية يعملان بشكل مستقل.' if off else '−5 ألطف قص • 0 متوازن • +1 إلى +5 نفس المستويات السابقة • القيم الأعلى قد تحذف الكلام الهادئ')
+        self.advanced.setVisible(not off);self.custom_panel.setVisible(not off and self.advanced.isChecked())
         custom=self.profile.currentIndex()==1;values=self.custom_values if custom else self.scale_values()
         for field,key,value in zip(self.fields,['threshold','padding','pause'],values):
             low,high=LIMITS[key];field.setRange(low if custom else min(low,value),high);field.setValue(value);field.setReadOnly(not custom);field.setEnabled(not self.worker)
         self.reset_custom.setEnabled(custom and not self.worker)
-        for button in self.level_buttons:button.setEnabled(not custom and not self.worker)
+        for button in self.level_buttons:button.setVisible(not off);button.setEnabled(not custom and not self.worker)
     def profile_changed(self,index):
         if self.last_profile==1:self.remember_custom()
         self.last_profile=index
         if index==1:self.advanced.setChecked(True)
+        elif index==2:self.advanced.setChecked(False)
         self.refresh_cut_controls()
     def copy_scale(self):
         self.custom_values=[max(LIMITS[k][0],min(LIMITS[k][1],v)) for k,v in zip(['threshold','padding','pause'],self.scale_values())]
@@ -124,6 +134,15 @@ class Window(QMainWindow):
         if self.profile.currentIndex()==1:self.remember_custom()
         self.settings.setValue('scaleLevel',self.levels.checkedId()-5);self.settings.setValue('cutProfile',self.profile.currentIndex())
         for key,value in zip(['customThreshold','customPadding','customPause'],self.custom_values):self.settings.setValue(key,value)
+    def edit_watermark(self):
+        if self.worker:return
+        dialog=WatermarkDialog(self.source,self.watermark_config,self)
+        if dialog.exec()==WatermarkDialog.Accepted:
+            self.watermark_config=dialog.result_config();self.watermark_label.setText(Path(self.watermark_config['file']).name);self.watermark_enabled.setChecked(True)
+    def toggle_watermark(self,enabled):
+        if enabled and not self.watermark_config:
+            self.edit_watermark()
+            if not self.watermark_config:self.watermark_enabled.setChecked(False)
     def select_file(self):
         filename,_=QFileDialog.getOpenFileName(self,'اختيار فيديو','','Video (*.mp4 *.mov *.mkv *.avi *.webm *.m4v)')
         if filename:self.load_file(Path(filename))
@@ -150,7 +169,7 @@ class Window(QMainWindow):
     def media_error(self,player):
         if player.media.error()!=QMediaPlayer.NoError:self.status.setText('تعذر تشغيل المعاينة: '+player.media.errorString()+' — يمكنك فتح الملف في مشغّل خارجي.')
     def busy(self,value):
-        for b in [self.choose,self.folder_button,self.mode,self.scope,self.core,self.music,self.profile,self.advanced,self.reset_custom,*self.fields,*self.level_buttons]:b.setEnabled(not value)
+        for b in [self.choose,self.folder_button,self.mode,self.scope,self.core,self.music,self.profile,self.advanced,self.reset_custom,self.filename_style,self.filename_prefix,self.watermark_enabled,self.watermark_button,*self.fields,*self.level_buttons]:b.setEnabled(not value)
         self.start.setEnabled(not value and self.scope.currentIndex()>0);self.run_button.setEnabled(not value and self.source is not None)
         self.cancel_button.setEnabled(value);self.progress.setVisible(value)
         if not value:self.refresh_cut_controls()
@@ -168,7 +187,12 @@ class Window(QMainWindow):
             QMessageBox.warning(self,'مكان الحفظ','تعذر الكتابة في المجلد. اختر مكانًا آخر.\n'+str(exc));return
         self.save_cut_settings();self.settings.setValue('mode',self.mode.currentIndex())
         self.output=None;self.clips=[];self.after.media.setSource(QUrl());self.after.controls(False)
-        self.start_job(ROOT/'app/tools/gui_process.py',['--input',str(self.source),'--destination',str(self.destination),'--engine',str(DATA),'--profile',['scale','custom'][self.profile.currentIndex()],'--level',str(self.levels.checkedId()-5),'--threshold',str(self.custom_values[0]),'--padding',str(self.custom_values[1]),'--pause',str(self.custom_values[2]),'--mode',['off','noise','music'][self.mode.currentIndex()],'--start',str(self.start.value()),'--length',str([0,30,60][self.scope.currentIndex()])])
+        args=['--input',str(self.source),'--destination',str(self.destination),'--engine',str(DATA),'--profile',('custom' if self.profile.currentIndex()==1 else 'scale'),'--level',str(self.levels.checkedId()-5),'--threshold',str(self.custom_values[0]),'--padding',str(self.custom_values[1]),'--pause',str(self.custom_values[2]),'--mode',['off','noise','music'][self.mode.currentIndex()],'--start',str(self.start.value()),'--length',str([0,30,60][self.scope.currentIndex()]),'--reports-root',str(DATA/'RUNS'),'--filename-style',['name','date','date-name','serial'][self.filename_style.currentIndex()],'--filename-prefix',self.filename_prefix.text()]
+        if self.profile.currentIndex()==2:args+=['--cut-off']
+        if self.watermark_enabled.isChecked():
+            for key in ['file','width','x','y','opacity']:args+=['--watermark-'+key,str(self.watermark_config[key])]
+        self.settings.setValue('filenameStyle',self.filename_style.currentIndex());self.settings.setValue('filenamePrefix',self.filename_prefix.text())
+        self.start_job(ROOT/'app/tools/export_process.py',args)
     def setup(self,which):
         if self.worker:return
         message='سيتم تنزيل أدوات المعالجة من الإنترنت مرة واحدة.' if which=='core' else 'تنظيف الموسيقى اختياري. سيُنزل مكتبات ونموذجًا كبيرًا وقد يحتاج عدة جيجابايت. أغلق البرامج الأخرى أثناء استخدامه على جهاز بذاكرة 8GB.'
@@ -184,7 +208,7 @@ class Window(QMainWindow):
         kind=e.get('event')
         if kind=='stage':
             message=e.get('message','')
-            translations={'Preparing test excerpt…':'تجهيز الجزء التجريبي…','Preparing local audio cleanup…':'تجهيز تنظيف الصوت…','Removing noise locally...':'إزالة الضوضاء محليًا…','Separating voice from music locally (this can take time)...':'فصل الكلام عن الموسيقى محليًا…','Using cached cleaned audio.':'استخدام الصوت المنظّف المحفوظ لتوفير الوقت.','Finding pauses and building comparison timeline…':'اكتشاف فترات الصمت وتجهيز المقارنة…','Rendering the edited video…':'حفظ الفيديو المعدّل…'}
+            translations={'Preparing test excerpt…':'تجهيز الجزء التجريبي…','Preparing local audio cleanup…':'تجهيز تنظيف الصوت…','Removing noise locally...':'إزالة الضوضاء محليًا…','Separating voice from music locally (this can take time)...':'فصل الكلام عن الموسيقى محليًا…','Using cached cleaned audio.':'استخدام الصوت المنظّف المحفوظ لتوفير الوقت.','Finding pauses and building comparison timeline…':'اكتشاف فترات الصمت وتجهيز المقارنة…','Rendering the edited video…':'حفظ الفيديو المعدّل…','Rendering the video…':'حفظ الفيديو…','Cutting Off — preserving all pauses…':'بدون قص — الحفاظ على جميع فترات الصمت…','Applying watermark — additional video encoding pass…':'إضافة العلامة المائية — مرحلة ترميز إضافية…','Saving video to the export folder…':'حفظ الفيديو في مجلد التصدير…'}
             self.status.setText(translations.get(message,message))
         elif kind=='log':self.log=Path(e['path']);self.report_button.setEnabled(True)
         elif kind=='error':self.status.setText('حدث خطأ: '+e.get('message','')+' — راجع السجل.');self.done=False
