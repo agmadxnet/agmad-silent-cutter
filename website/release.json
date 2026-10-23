@@ -1,21 +1,18 @@
 {
   "version": "1.5.1",
-  "status": "prepared-for-review",
-  "published": false,
-  "websiteDeployed": false,
+  "status": "stable",
+  "published": true,
   "repository": "https://github.com/agmadxnet/agmad-silent-cutter",
   "productPath": "/projects/silent-cutter/",
-  "assets": {},
-  "proposedAssets": {
+  "assets": {
     "macos": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Mac_1.5.1.dmg",
-    "macosZip": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Mac_1.5.1.zip",
     "windows": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Windows_1.5.1.zip",
     "source": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Source_1.5.1.zip",
     "checksums": "https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/SHA256SUMS"
   },
-  "ownerTestAcceptance": {
-    "macos": true,
-    "windows": true
-  },
-  "notes": "Proposed URLs are unverified until actual publication. Public remains 1.4.0."
+  "websiteDeployed": true,
+  "sourceTagCommit": "c15cf068cc053ebc9e6e381d92751c211e9abf94",
+  "testAcceptance": "Owner reported Mac and Windows 1.5.1 tests passed; detailed device/mode coverage not supplied",
+  "installersRebuilt": false,
+  "previousReleaseRetained": "1.4.0"
 }
