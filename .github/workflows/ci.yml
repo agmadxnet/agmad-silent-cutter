@@ -27,6 +27,7 @@ jobs:
       - run: python scripts/package_windows.py --output build
       - shell: pwsh
         run: |
-          $runtime = 'build/Agmad_Silent_Cutter_Windows_1.4.0/runtime/python.exe'
+          $version = (Get-Content VERSION -Raw).Trim()
+          $runtime = "build/Agmad_Silent_Cutter_Windows_$version/runtime/python.exe"
           & $runtime -c "from PySide6.QtWidgets import QApplication; from PySide6.QtMultimedia import QMediaPlayer; print('Qt imports passed')"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
