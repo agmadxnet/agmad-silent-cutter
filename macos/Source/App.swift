@@ -68,6 +68,13 @@ final class App: NSObject, NSApplicationDelegate {
     var wasCancelled = false
     var clips: [Clip] = []
     var observer: Any?
+    var watermarkURL: URL?
+    var watermarkSettings = WatermarkSettings()
+    var watermarkEditor: WatermarkEditor?
+    let watermarkEnabled = NSButton(checkboxWithTitle: "Watermark", target: nil, action: nil)
+    let watermarkChoose = NSButton(title: "Choose PNG…", target: nil, action: nil)
+    let watermarkPosition = NSButton(title: "Position & opacity…", target: nil, action: nil)
+    let watermarkLabel = NSTextField(labelWithString: "Optional · Off")
     var followBusy = false
     var root: URL { Bundle.main.resourceURL!.appendingPathComponent("engine") }
     var dataRoot: URL {
@@ -105,6 +112,8 @@ final class App: NSObject, NSApplicationDelegate {
     let cancelButton = NSButton(title: "Cancel", target: nil, action: nil)
     let openButton = NSButton(title: "Open output folder", target: nil, action: nil)
     let logButton = NSButton(title: "Open report", target: nil, action: nil)
+    let filenameStyle = NSPopUpButton()
+    let filenamePrefix = NSTextField(string: "")
     let cutMode = NSPopUpButton()
     let advancedToggle = NSButton(checkboxWithTitle: "Advanced values", target: nil, action: nil)
     let thresholdField = NSTextField(string: "2")
@@ -168,7 +177,8 @@ final class App: NSObject, NSApplicationDelegate {
         let title = NSTextField(labelWithString: "Agmad Silent Cutter")
         title.font = .systemFont(ofSize: 30, weight: .light)
         title.textColor = NSColor(srgbRed: 242/255, green: 243/255, blue: 246/255, alpha: 1)
-        let brand = NSTextField(labelWithString: "A G M A D   /   LOCAL VIDEO TOOLS                                    1.4.0")
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.5.0"
+        let brand = NSTextField(labelWithString: "A G M A D   /   LOCAL VIDEO TOOLS                                    " + version)
         brand.font = .systemFont(ofSize: 10, weight: .medium); brand.textColor = NSColor(srgbRed: 175/255, green: 182/255, blue: 197/255, alpha: 1)
         let subtitle = NSTextField(labelWithString: "Local cleanup. Clearer pacing. Originals preserved.")
         subtitle.textColor = .secondaryLabelColor; subtitle.font = .systemFont(ofSize: 13)
@@ -181,6 +191,13 @@ final class App: NSObject, NSApplicationDelegate {
         let setup = button("Install cleanup tools…", #selector(runSetup))
         let sourceRow = row([choose, sourceLabel])
         let folderRow = row([folder, folderLabel])
+        filenameStyle.addItems(withTitles:["Original name", "Date", "Date + name", "Numeric serial"])
+        filenameStyle.selectItem(at:min(3,max(0,defaults.integer(forKey:"filenameStyle"))))
+        filenameStyle.target = self;filenameStyle.action = #selector(saveSettings)
+        filenamePrefix.stringValue = defaults.string(forKey:"filenamePrefix") ?? ""
+        filenamePrefix.placeholderString = "Optional prefix";filenamePrefix.widthAnchor.constraint(equalToConstant:160).isActive = true
+        let namesHint = label("MP4 files only · no overwrites");namesHint.textColor = .secondaryLabelColor
+        let filenameRow = row([label("Export filename"),filenameStyle,label("Prefix"),filenamePrefix,namesHint])
         cleanup.addItems(withTitles: ["Off", "Noise", "Music"])
         cleanup.selectItem(at: min(2, max(0, defaults.integer(forKey: "cleanup"))))
         strength.selectedSegment = min(10, max(0, defaults.integer(forKey: "scaleLevel") + 5))
@@ -190,14 +207,20 @@ final class App: NSObject, NSApplicationDelegate {
         scope.target = self; scope.action = #selector(scopeChanged)
         startField.placeholderString = "Seconds"; startField.isEnabled = false
         startField.widthAnchor.constraint(equalToConstant: 75).isActive = true
-        cutMode.addItems(withTitles: ["Preset scale", "Custom"])
-        cutMode.selectItem(at: min(1, max(0, defaults.integer(forKey: "scaleMode"))))
+        cutMode.addItems(withTitles: ["Preset scale", "Custom", "Off"])
+        cutMode.selectItem(at: min(2, max(0, defaults.integer(forKey: "scaleMode"))))
         previousMode = cutMode.indexOfSelectedItem
         for (i, key) in ["customThreshold", "customPadding", "customPause"].enumerated() { if defaults.object(forKey: key) != nil { customValues[i] = defaults.double(forKey: key) } }
         cutMode.target = self; cutMode.action = #selector(cutModeChanged)
         advancedToggle.target = self; advancedToggle.action = #selector(toggleAdvanced)
         if previousMode == 1 { advancedToggle.state = .on }
         let cutRow = row([label("Cutting mode"), cutMode, strength, advancedToggle])
+        watermarkEnabled.target = self; watermarkEnabled.action = #selector(watermarkChanged)
+        watermarkChoose.target = self; watermarkChoose.action = #selector(chooseWatermark); watermarkChoose.bezelStyle = .rounded
+        watermarkPosition.target = self; watermarkPosition.action = #selector(positionWatermark); watermarkPosition.bezelStyle = .rounded
+        watermarkPosition.isEnabled = false
+        watermarkLabel.font = .systemFont(ofSize:11); watermarkLabel.textColor = .secondaryLabelColor
+        let watermarkRow = row([watermarkEnabled, watermarkChoose, watermarkPosition, watermarkLabel])
         let settings = row([label("Audio cleanup"), cleanup, label("Process"), scope, label("Start (sec)"), startField])
         for (field, bounds) in [(thresholdField, (0.5,40.0)), (paddingField, (0.02,0.60)), (pauseField, (0.1,2.0))] {
             let formatter = NumberFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.numberStyle = .decimal; formatter.usesGroupingSeparator = false; formatter.maximumFractionDigits = 3
@@ -247,7 +270,7 @@ final class App: NSObject, NSApplicationDelegate {
         status.lineBreakMode = .byTruncatingMiddle
         statistics.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
         let support = row([engine, setup, engineLabel])
-        let outer = NSStackView(views: [brand, title, subtitle, sourceRow, folderRow, cutRow, settings, cutHint, advancedPanel, players, comparison, statistics, actions, row([progress, status]), support])
+        let outer = NSStackView(views: [brand, title, subtitle, sourceRow, folderRow, filenameRow, cutRow, settings, cutHint, advancedPanel, watermarkRow, players, comparison, statistics, actions, row([progress, status]), support])
         outer.orientation = .vertical; outer.alignment = .leading; outer.spacing = 10
         outer.translatesAutoresizingMaskIntoConstraints = false
         content.addSubview(outer)
@@ -256,7 +279,7 @@ final class App: NSObject, NSApplicationDelegate {
         sourceLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         folderLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         engineLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        jobControls = [choose, folder, engine, setup, strength, cleanup, scope, startField, cutMode, advancedToggle, thresholdField, paddingField, pauseField, resetButton]
+        jobControls = [filenameStyle, filenamePrefix, watermarkEnabled, watermarkChoose, watermarkPosition, choose, folder, engine, setup, strength, cleanup, scope, startField, cutMode, advancedToggle, thresholdField, paddingField, pauseField, resetButton]
         refreshPaths(); processButton.isEnabled = false
         window.center(); window.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
         observer = nil
@@ -267,8 +290,11 @@ final class App: NSObject, NSApplicationDelegate {
                 loadSource(URL(fileURLWithPath: input)); strength.selectedSegment = min(10,max(0,(Int(env["CUTTER_LEVEL"] ?? "0") ?? 0)+5)); cleanup.selectItem(at: Int(env["CUTTER_CLEANUP"] ?? "0") ?? 0)
                 cutMode.selectItem(at: Int(env["CUTTER_PROFILE"] ?? "0") ?? 0)
                 previousMode = cutMode.indexOfSelectedItem
+                filenameStyle.selectItem(at:Int(env["CUTTER_FILENAME_STYLE"] ?? "0") ?? 0)
+                filenamePrefix.stringValue = env["CUTTER_FILENAME_PREFIX"] ?? ""
                 if previousMode == 1 { advancedToggle.state = .on }
                 refreshCutControls()
+                if let logo = env["CUTTER_WATERMARK"] { watermarkURL = URL(fileURLWithPath:logo);watermarkEnabled.state = .on;watermarkChanged() }
                 processVideo()
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 45) { print("Integration timed out"); self.cancelJob(); exit(2) }
@@ -282,6 +308,10 @@ final class App: NSObject, NSApplicationDelegate {
             thresholdField.stringValue = "0.49"; assert(readCustom() == nil)
             resetCustom(); cutMode.selectItem(at: 0); cutModeChanged()
             assert(!strength.isHidden)
+            cutMode.selectItem(at:2);cutModeChanged()
+            assert(strength.isHidden && advancedPanel.isHidden && advancedToggle.isHidden)
+            assert(cutHint.stringValue.contains("keeps all pauses"))
+            cutMode.selectItem(at:0);cutModeChanged();assert(!strength.isHidden)
             let suite = "net.agmad.silentcutter.release13.migration-check"
             let prefs = UserDefaults(suiteName: suite)!
             prefs.removePersistentDomain(forName: suite)
@@ -301,12 +331,37 @@ final class App: NSObject, NSApplicationDelegate {
             prefs.removePersistentDomain(forName:suite)
             print("Migration, preset switching, Custom reset, and field-boundary checks passed")
             assert(mappedTime(1.5, [Clip(start: 0, duration: 1, source: 0), Clip(start: 1, duration: 2, source: 4)]) == 4.5)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            if ProcessInfo.processInfo.environment["CUTTER_SMOKE_OFF"] == "1" { cutMode.selectItem(at:2);cutModeChanged() }
+            if let input = ProcessInfo.processInfo.environment["CUTTER_INPUT"], let logo = ProcessInfo.processInfo.environment["CUTTER_WATERMARK_PREVIEW"] {
+                loadSource(URL(fileURLWithPath:input));watermarkURL = URL(fileURLWithPath:logo);watermarkEnabled.state = .on;watermarkChanged();positionWatermark()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                if ProcessInfo.processInfo.environment["CUTTER_WATERMARK_PREVIEW"] != nil {
+                    assert(self.watermarkEditor?.window?.sheetParent != nil)
+                    let editor = self.watermarkEditor!
+                    editor.opacitySlider.doubleValue = 25;editor.sizeSlider.doubleValue = 20;editor.change()
+                    assert(editor.canvas.settings.opacity == 0.25 && editor.canvas.settings.width == 0.2)
+                    editor.window!.contentView!.layoutSubtreeIfNeeded()
+                    assert(editor.opacitySlider.visibleRect.height > 0 && editor.sizeSlider.visibleRect.height > 0)
+                    editor.window!.contentView!.displayIfNeeded()
+                    assert(editor.canvas.videoRect.contains(editor.canvas.logoRect))
+                    let point = editor.canvas.convert(NSPoint(x:editor.canvas.videoRect.maxX,y:editor.canvas.videoRect.minY),to:nil)
+                    if let event = NSEvent.mouseEvent(with:.leftMouseDown,location:point,modifierFlags:[],timestamp:0,windowNumber:editor.window!.windowNumber,context:nil,eventNumber:0,clickCount:1,pressure:1) {
+                        editor.canvas.position(event)
+                        assert(editor.canvas.settings.x == 1 && editor.canvas.settings.y == 0)
+                    }
+                    if let view = editor.window?.contentView, let image = view.bitmapImageRepForCachingDisplay(in:view.bounds) {
+                        view.cacheDisplay(in:view.bounds,to:image)
+                        if let data = image.representation(using:.png,properties:[:]), let path = ProcessInfo.processInfo.environment["CUTTER_WATERMARK_SCREENSHOT"] { try? data.write(to:URL(fileURLWithPath:path)) }
+                    }
+                    print("Watermark sheet, bounds, size and opacity checks passed")
+                }
                 if let image = content.bitmapImageRepForCachingDisplay(in: content.bounds) {
                     content.cacheDisplay(in: content.bounds, to: image)
                     if let data = image.representation(using: .png, properties: [:]), let path = ProcessInfo.processInfo.environment["CUTTER_SCREENSHOT"] { try? data.write(to: URL(fileURLWithPath: path)) }
                 }
                 print("UI smoke test and comparison mapping passed")
+                if let sheet = self.window.attachedSheet { self.window.endSheet(sheet) }
                 NSApp.terminate(nil)
             }
         }
@@ -328,8 +383,50 @@ final class App: NSObject, NSApplicationDelegate {
         originalView.controlsStyle = .inline
         editedView.player = nil
         audio.isEnabled = false; linked.isEnabled = false; logButton.isEnabled = false
-        processButton.isEnabled = true; status.stringValue = "Ready to process."
+        processButton.isEnabled = true; watermarkChanged(); status.stringValue = "Ready to process."
         statistics.stringValue = "Choose a short test to check settings before processing the full video."
+    }
+    @objc func watermarkChanged() {
+        watermarkPosition.isEnabled = job == nil && watermarkURL != nil && source != nil && watermarkEnabled.state == .on
+        watermarkLabel.stringValue = watermarkEnabled.state == .on ? (watermarkURL?.lastPathComponent ?? "Choose a PNG") : "Optional · Off"
+    }
+    @objc func chooseWatermark() {
+        let panel = NSOpenPanel(); panel.allowedContentTypes = [.png]; panel.allowsMultipleSelection = false
+        if panel.runModal() == .OK, let url = panel.url {
+            guard let image = NSImage(contentsOf:url), image.size.width > 0, image.size.height > 0,
+                  let size = try? url.resourceValues(forKeys:[.fileSizeKey]).fileSize, size <= 20*1024*1024 else { showError("Choose a valid PNG smaller than 20 MB."); return }
+            watermarkURL = url; watermarkEnabled.state = .on; watermarkChanged()
+        }
+    }
+    @objc func positionWatermark() {
+        guard let source = source, let url = watermarkURL, let logo = NSImage(contentsOf:url) else { return }
+        status.stringValue = "Loading watermark preview…"
+        let settings = watermarkSettings
+        DispatchQueue.global(qos:.userInitiated).async {
+            let generator = AVAssetImageGenerator(asset:AVURLAsset(url:source));generator.appliesPreferredTrackTransform = true
+            do {
+                let image: NSImage
+                do {
+                    let cg = try generator.copyCGImage(at:.zero,actualTime:nil)
+                    image = NSImage(cgImage:cg,size:NSSize(width:cg.width,height:cg.height))
+                } catch {
+                    // FFmpeg can preview codecs the native macOS player cannot decode.
+                    let process = Process();process.executableURL = URL(fileURLWithPath:"/usr/bin/env")
+                    process.arguments = ["ffmpeg","-nostdin","-v","error","-i",source.path,"-frames:v","1","-vf","scale=1280:-1","-f","image2pipe","-c:v","png","pipe:1"]
+                    var env = ProcessInfo.processInfo.environment;env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";process.environment = env
+                    let pipe = Pipe();process.standardOutput = pipe;process.standardError = FileHandle.nullDevice
+                    try process.run();let data = pipe.fileHandleForReading.readDataToEndOfFile();process.waitUntilExit()
+                    guard process.terminationStatus == 0, let decoded = NSImage(data:data) else { throw NSError(domain:"WatermarkPreview",code:1) }
+                    image = decoded
+                }
+                DispatchQueue.main.async {
+                    guard self.job == nil, self.source == source, self.watermarkURL == url else { return }
+                    let controller = WatermarkEditor(frame:image,logo:logo,settings:settings)
+                    controller.onDone = { [weak self] value in self?.watermarkSettings = value; self?.watermarkChanged() }
+                    self.watermarkEditor = controller;self.window.beginSheet(controller.window!);self.status.stringValue = "Ready. Watermark settings apply to the next export."
+                }
+            } catch { DispatchQueue.main.async { self.showError("This video frame could not be previewed. Try a short compatible MP4 first."); self.status.stringValue = "Watermark preview unavailable." } }
+        }
     }
     @objc func chooseDestination() {
         let p = NSOpenPanel(); p.canChooseDirectories = true; p.canChooseFiles = false; p.canCreateDirectories = true; p.directoryURL = destination
@@ -362,11 +459,14 @@ final class App: NSObject, NSApplicationDelegate {
     }
     func refreshCutControls() {
         let custom = cutMode.indexOfSelectedItem == 1
-        strength.isHidden = custom
-        advancedPanel?.isHidden = advancedToggle.state != .on
+        let off = cutMode.indexOfSelectedItem == 2
+        strength.isHidden = custom || off
+        advancedToggle.isHidden = off
+        advancedPanel?.isHidden = off || advancedToggle.state != .on
         let values = custom ? customValues : baseValues()
         for (field,value) in zip([thresholdField,paddingField,pauseField], values) { field.stringValue = String(format: "%.3f",value); field.isEnabled = custom && job == nil }
         resetButton.isEnabled = custom && job == nil
+        if off { cutHint.stringValue = "Cutting Off: keeps all pauses. Audio cleanup and watermark remain available."; return }
         cutHint.stringValue = custom ? "Custom values remembered. Reset loads the selected scale level within Custom limits." : "−5 gentlest · 0 balanced (still cuts pauses) · +5 strongest. +1 to +5 are unchanged."
     }
     @objc func cutModeChanged() {
@@ -390,6 +490,8 @@ final class App: NSObject, NSApplicationDelegate {
         defaults.set(cutMode.indexOfSelectedItem, forKey: "scaleMode"); defaults.set(strength.selectedSegment - 5, forKey: "scaleLevel")
         for (key,value) in zip(["customThreshold", "customPadding", "customPause"],customValues) { defaults.set(value, forKey:key) }
         defaults.set(cleanup.indexOfSelectedItem, forKey: "cleanup")
+        defaults.set(filenameStyle.indexOfSelectedItem,forKey:"filenameStyle")
+        defaults.set(filenamePrefix.stringValue,forKey:"filenamePrefix")
     }
     @objc func scopeChanged() { startField.isEnabled = scope.indexOfSelectedItem > 0 && job == nil }
     func stopPlayers() {
@@ -417,7 +519,7 @@ final class App: NSObject, NSApplicationDelegate {
         for control in jobControls { control.isEnabled = !value }
         processButton.isEnabled = !value && source != nil; cancelButton.isEnabled = value
         startField.isEnabled = !value && scope.indexOfSelectedItem > 0
-        if value { progress.startAnimation(nil) } else { progress.stopAnimation(nil); refreshCutControls() }
+        if value { progress.startAnimation(nil) } else { progress.stopAnimation(nil); refreshCutControls(); watermarkChanged() }
     }
     @objc func processVideo() {
         guard job == nil, let source = source else { return }
@@ -425,6 +527,7 @@ final class App: NSObject, NSApplicationDelegate {
         if scope.indexOfSelectedItem > 0 && (!start.isFinite || start < 0) { showError("Enter a non-negative start time in seconds."); return }
         window.makeFirstResponder(nil)
         if cutMode.indexOfSelectedItem == 1 && readCustom() == nil { showError("Custom values are outside the allowed limits. See Advanced values for guidance."); return }
+        if watermarkEnabled.state == .on && (watermarkURL == nil || !FileManager.default.fileExists(atPath: watermarkURL!.path)) { showError("Choose an existing PNG watermark, or switch Watermark off."); return }
         stopPlayers(); saveSettings(); gotDone = false; wasCancelled = false; clips = []
         output = nil; log = nil; logButton.isEnabled = false; editedView.player = nil
         audio.isEnabled = false; linked.isEnabled = false
@@ -433,8 +536,15 @@ final class App: NSObject, NSApplicationDelegate {
         let p = Process(); job = p
         p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         let length = scope.indexOfSelectedItem == 1 ? 30 : scope.indexOfSelectedItem == 2 ? 60 : 0
-        p.arguments = ["python3", "-u", root.appendingPathComponent("tools/gui_process.py").path, "--input", source.path, "--destination", destination.path, "--engine", engineRoot.path, "--level", String(strength.selectedSegment - 5), "--mode", ["off", "noise", "music"][cleanup.indexOfSelectedItem], "--start", String(max(0, start)), "--length", String(length)]
-        p.arguments! += ["--profile", ["scale", "custom"][cutMode.indexOfSelectedItem]]
+        p.arguments = ["python3", "-u", root.appendingPathComponent("tools/export_process.py").path, "--input", source.path, "--destination", destination.path, "--engine", engineRoot.path, "--level", String(strength.selectedSegment - 5), "--mode", ["off", "noise", "music"][cleanup.indexOfSelectedItem], "--start", String(max(0, start)), "--length", String(length)]
+        if watermarkEnabled.state == .on, let logo = watermarkURL {
+            p.arguments! += ["--watermark-file", logo.path, "--watermark-x", String(watermarkSettings.x), "--watermark-y", String(watermarkSettings.y), "--watermark-width", String(watermarkSettings.width), "--watermark-opacity", String(watermarkSettings.opacity)]
+        }
+        p.arguments! += ["--profile", cutMode.indexOfSelectedItem == 1 ? "custom" : "scale",
+                          "--filename-style",["name","date","date-name","serial"][filenameStyle.indexOfSelectedItem],
+                          "--filename-prefix",filenamePrefix.stringValue,
+                          "--reports-root",dataRoot.appendingPathComponent("RUNS").path]
+        if cutMode.indexOfSelectedItem == 2 { p.arguments! += ["--cut-off"] }
         if cutMode.indexOfSelectedItem == 1 { p.arguments! += ["--threshold", String(customValues[0]), "--padding", String(customValues[1]), "--pause", String(customValues[2])] }
         var env = ProcessInfo.processInfo.environment
         env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -531,7 +641,12 @@ final class App: NSObject, NSApplicationDelegate {
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }
-let app = NSApplication.shared
-app.setActivationPolicy(.regular)
-let delegate = App(); app.delegate = delegate
-app.run()
+@main
+struct SilentCutterMain {
+    static func main() {
+        let app = NSApplication.shared
+        app.setActivationPolicy(.regular)
+        let delegate = App(); app.delegate = delegate
+        withExtendedLifetime(delegate) { app.run() }
+    }
+}
