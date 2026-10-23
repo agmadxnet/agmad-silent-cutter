@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.1 — prepared, publication pending
+
+- AV1 cleanup compatibility correction; owner-reported long Mac recording passed.
+- PNG watermark position/size/opacity and independent Cutting Off.
+- Flat MP4-only exports, filename styles and prefix with no-overwrite protection.
+- Arabic Windows port; owner reported both platform tests passed.
+- Tested installers preserved; signing/testing limits remain explicit.
+
+
 ## 1.4.0 — release candidate, 2026-10-20
 
 - AGMAD near-black/silver/ice-blue presentation on both platforms.

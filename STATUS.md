@@ -32,3 +32,17 @@ The English/Arabic production product pages and project badges were deployed on 
 ## Stable approval
 
 The owner explicitly approved stable promotion on 22 October 2026 after confirming Medhat’s Windows test. GitHub release labels and documentation are updated without rebuilding or replacing the tested installers or tag.
+
+## Mac 1.5.1 accepted locally
+
+The owner reported the Mac 1.5.1 test working on 22 October 2026. This build combines the accepted long-video compatibility fix and PNG watermark controls with Cutting Off, flat MP4-only destination exports, four filename styles and an optional prefix. Seventeen automated checks and native Mac export/linked-playback checks passed before packaging; DMG and ZIP contents were verified. See docs/MAC_EXPORT_TEST.md.
+
+Public release remains 1.4.0. The Windows port and owner-reported test acceptance are recorded below. Next step: prepare a coordinated release for approval. Export playback speed and selected-clip exports remain proposals.
+
+## Windows 1.5.1 local test candidate
+
+The accepted Mac features are ported to the Arabic Windows interface: PNG watermark placement/opacity, Cutting Off, one MP4-only destination, filename styles and optional prefix. Existing Windows cancellation and tool/model paths are retained. Source/media checks and the Qt interface/export/linked-playback checks passed on Mac with cached cleanup audio; Windows binaries and installer have not run here. See docs/WINDOWS_1.5.1_VALIDATION.md. The 1.5.1_Test ZIP is ready for Medhat's native test: ZIP integrity, packaged source/docs and all 1,077 locked runtime files were verified. Package SHA-256 and local evidence are recorded in work/windows151/VALIDATION.json in the owner workspace; public downloads remain 1.4.0.
+
+## Windows 1.5.1 test accepted
+
+The owner reported “done test passed” for the delivered Windows 1.5.1_Test package. Detailed device, mode and long-recording results were not supplied; this is owner-reported acceptance, not an independently observed native test. Both Mac and Windows 1.5.1 candidates now have owner test confirmation. Preserve the tested packages and their recorded checksums. Public release remains 1.4.0; preparing release notes and a reviewed publication bundle is next, with explicit approval required before GitHub/site publication.

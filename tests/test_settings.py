@@ -19,7 +19,17 @@ class SettingsTests(unittest.TestCase):
     with self.subTest(key=key,value=bad),self.assertRaises(ValueError):settings.resolve('custom',engine.PRESETS,**values)
  def test_custom_inclusive_bounds(self):
   for index in [0,1]:settings.resolve('custom',engine.PRESETS,**{key:limits[index] for key,limits in settings.LIMITS.items()})
- def test_no_processing_drift_from_working_13(self):
+ def test_reviewed_processing_baselines(self):
   baseline=json.loads((ROOT/'tests/engine-baseline-1.3.json').read_text())
-  for path,sha in baseline.items():self.assertEqual(hashlib.sha256((ROOT/path).read_bytes()).hexdigest(),sha,path)
+  approved=json.loads((ROOT/'tests/engine-baseline-1.5.1.json').read_text())
+  baseline.update(approved)
+  baseline.update(json.loads((ROOT/'tests/engine-baseline-windows-1.5.1.json').read_text()))
+  for path,sha in baseline.items():
+   data=(ROOT/path).read_bytes()
+   if path.endswith('/tools/process.py'):
+    # Only the reviewed 1.4.1 AV1 cleanup-container correction differs.
+    data=data.replace(b"prepared = temp / 'prepared.mkv'",b"prepared = temp / 'prepared.mov'")
+    data=data.replace(b"'-c:v', 'copy', '-c:a', 'flac'",b"'-c:v', 'copy', '-c:a', 'pcm_s16le'")
+    data=data.replace(b'    # Matroska accepts copied AV1/VP9 as well as H.264 with lossless FLAC audio.\n    # MOV rejects AV1 at header writing, even when a re-encoded test excerpt succeeds.\n',b'')
+   self.assertEqual(hashlib.sha256(data).hexdigest(),sha,path)
 if __name__=='__main__':unittest.main()

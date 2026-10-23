@@ -34,6 +34,16 @@ def mapping(timeline, source_offset):
                  source=float(c['offset']) / rate + source_offset) for c in clips]
 
 
+def render(ready, options, target, log, cut_off=False):
+    if cut_off:
+        engine.run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', ready,
+                    '-map', '0:v:0', '-map', '0:a:0', '-c:v', 'libx264', '-preset', 'fast',
+                    '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', target], log)
+    else:
+        engine.run(options + ['--video-codec', 'libx264', '--audio-codec', 'aac',
+                   '--pix-fmt', 'yuv420p', '-o', target], log)
+
+
 def main():
     if os.getpgrp() != os.getpid():
         os.setsid()  # cancellation targets only this job and its children
@@ -52,6 +62,8 @@ def main():
     ap.add_argument('--mode', choices=['off', 'noise', 'music'], required=True)
     ap.add_argument('--start', type=float, default=0)
     ap.add_argument('--length', type=float, default=0)
+    ap.add_argument('--cut-off', action='store_true')
+    ap.add_argument('--work-directory')
     args = ap.parse_args()
     source = Path(args.input).resolve()
     destination = Path(args.destination).resolve()
@@ -62,8 +74,8 @@ def main():
         raise ValueError('Test start and length cannot be negative.')
     if args.mode != 'off':
         (engine.ROOT / 'CACHE').mkdir(exist_ok=True)
-    threshold, margin, smooth, tag = resolve(args.profile, engine.PRESETS, args.strength, args.gentle_preset, args.threshold, args.padding, args.pause, args.level)
-    for name in ('ffmpeg', 'ffprobe', 'auto-editor'):
+    threshold, margin, smooth, tag = ('', '', '', 'NO_CUT') if args.cut_off else resolve(args.profile, engine.PRESETS, args.strength, args.gentle_preset, args.threshold, args.padding, args.pause, args.level)
+    for name in (('ffmpeg', 'ffprobe') if args.cut_off else ('ffmpeg', 'ffprobe', 'auto-editor')):
         if not shutil.which(name):
             raise ValueError('Missing ' + name + '. Use Install cleanup tools to run setup.')
     if args.mode == 'noise' and not os.access(engine.ROOT / 'tools/runtime/deep-filter', os.X_OK):
@@ -75,7 +87,9 @@ def main():
     start = args.start if args.length else 0
     if start >= original_duration:
         raise ValueError('Test start must be before the end of the video.')
-    run = Path(tempfile.mkdtemp(prefix=time.strftime('Silence_Cutter_%Y%m%d_%H%M%S_'), dir=destination))
+    work_directory = Path(args.work_directory).resolve() if args.work_directory else destination
+    work_directory.mkdir(parents=True, exist_ok=True)
+    run = Path(tempfile.mkdtemp(prefix=time.strftime('Silence_Cutter_%Y%m%d_%H%M%S_'), dir=work_directory))
     target = run / (source.stem + '_' + tag + '_' + args.mode.upper() + '_CLEAN.mp4')
     logpath = run / 'PROCESS.log'
     emit('log', path=str(logpath))
@@ -95,18 +109,22 @@ def main():
                 emit('stage', message='Preparing local audio cleanup…')
                 ready = engine.cleaned_source(ready, args.mode, temp, log,
                             lambda m: emit('stage', message=m))
-            emit('stage', message='Finding pauses and building comparison timeline…')
-            options = ['auto-editor', ready, '--edit', 'audio:threshold=' + threshold,
-                       '--margin', margin, '--smooth', smooth, '--no-open']
-            timeline_path = temp / 'timeline.v3'
-            engine.run(options + ['--export', 'v3', '-o', timeline_path], log)
-            timeline = json.loads(timeline_path.read_text())
-            clips = mapping(timeline, start)
             input_duration = float(engine.probe(ready)['format']['duration'])
+            options = []
+            if args.cut_off:
+                emit('stage', message='Cutting Off — preserving all pauses…')
+                clips = [dict(start=0.0, duration=input_duration, source=start)]
+            else:
+                emit('stage', message='Finding pauses and building comparison timeline…')
+                options = ['auto-editor', ready, '--edit', 'audio:threshold=' + threshold,
+                           '--margin', margin, '--smooth', smooth, '--no-open']
+                timeline_path = temp / 'timeline.v3'
+                engine.run(options + ['--export', 'v3', '-o', timeline_path], log)
+                timeline = json.loads(timeline_path.read_text())
+                clips = mapping(timeline, start)
             planned_duration = max(c['start'] + c['duration'] for c in clips)
-            emit('stage', message='Rendering the edited video…')
-            engine.run(options + ['--video-codec', 'libx264', '--audio-codec', 'aac',
-                       '--pix-fmt', 'yuv420p', '-o', target], log)
+            emit('stage', message='Rendering the video…')
+            render(ready, options, target, log, args.cut_off)
             rendered = engine.probe(target)
             kinds = {s['codec_type'] for s in rendered['streams']}
             if not {'audio', 'video'}.issubset(kinds):
@@ -117,11 +135,11 @@ def main():
             report = dict(source=str(source), output=str(target), log=str(logpath),
                           inputDuration=input_duration, outputDuration=duration,
                           sourceOffset=start, clips=clips, strength=int(args.strength) if args.profile=='standard' else None, mode=args.mode,
-                          profile=args.profile, level=args.level if args.profile=='scale' else None, preset=tag, threshold=threshold, padding=margin, smooth=smooth,
-                          removedPercent=max(0, 100 * (1 - duration / input_duration)))
+                          profile='off' if args.cut_off else args.profile, level=args.level if args.profile=='scale' and not args.cut_off else None, preset=tag, threshold=threshold, padding=margin, smooth=smooth,
+                          removedPercent=0.0 if args.cut_off else max(0, 100 * (1 - duration / input_duration)))
             (run / 'comparison.json').write_text(json.dumps(report, indent=2))
             (run / 'SUMMARY.txt').write_text(
-                f'Source: {source}\nOutput: {target}\nProfile: {args.profile} / {tag}\nLevel: {args.level if args.profile=="scale" else "custom/legacy"}\nThreshold: {threshold}\nPadding: {margin}\nMinimum cut/clip: {smooth}\nCleanup: {args.mode}\n'
+                f'Source: {source}\nOutput: {target}\nProfile: {"off" if args.cut_off else args.profile} / {tag}\nLevel: {args.level if args.profile=="scale" else "custom/legacy"}\nThreshold: {threshold}\nPadding: {margin}\nMinimum cut/clip: {smooth}\nCleanup: {args.mode}\n'
                 f'Input/excerpt: {input_duration:.3f}s\nEdited: {duration:.3f}s\n'
                 f'Removed: {report["removedPercent"]:.1f}%\nKept segments: {len(clips)}\n'
                 f'Test source offset: {start:.3f}s\n')

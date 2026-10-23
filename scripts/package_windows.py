@@ -1,5 +1,5 @@
 """Build Windows package with a verified existing runtime or locked official downloads."""
-import argparse,hashlib,html,json,shutil,urllib.request,zipfile
+import argparse,hashlib,html,json,re,shutil,urllib.request,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -14,10 +14,13 @@ def download(url,sha,target):
   with urllib.request.urlopen(url,timeout=120) as response,target.open('wb') as output:shutil.copyfileobj(response,output)
  if digest(target)!=sha:target.unlink();raise ValueError('Checksum mismatch: '+url)
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--runtime',type=Path);args=ap.parse_args()
- version=(ROOT/'VERSION').read_text().strip();dest=args.output/f'Agmad_Silent_Cutter_Windows_{version}'
+ ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--runtime',type=Path);ap.add_argument('--version');ap.add_argument('--readme',type=Path);ap.add_argument('--validation',type=Path);args=ap.parse_args()
+ version=args.version or (ROOT/'VERSION').read_text().strip();
+ if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:_Test)?',version):raise ValueError('Invalid package version')
+ dest=args.output/f'Agmad_Silent_Cutter_Windows_{version}'
  if dest.exists():raise ValueError('Output exists; choose a fresh build folder')
- shutil.copytree(ROOT/'windows',dest,ignore=shutil.ignore_patterns('__pycache__','*.pyc','runtime'))
+ shutil.copytree(ROOT/'windows',dest,ignore=shutil.ignore_patterns('__pycache__','*.pyc','runtime','.DS_Store'))
+ info_path=dest/'assets/build-info.json';info=json.loads(info_path.read_text());info['app_version']=version;info_path.write_text(json.dumps(info,indent=2)+'\n')
  runtime=dest/'runtime';expected=json.loads((ROOT/'windows/assets/runtime-sha256.json').read_text())
  if args.runtime:shutil.copytree(args.runtime,runtime,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
  else:
@@ -38,10 +41,10 @@ def main():
   item=runtime/name
   if name=='python313._pth':continue
   if not item.is_file() or digest(item)!=sha:raise ValueError('Runtime file mismatch: '+name)
- readme=(ROOT/'docs/WINDOWS.ar.md').read_text();(dest/'README_AR.md').write_text(readme,encoding='utf-8')
+ readme=(args.readme or ROOT/'docs/WINDOWS.ar.md').read_text(encoding='utf-8');(dest/'README_AR.md').write_text(readme,encoding='utf-8')
  (dest/'README_AR.html').write_text('<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>AGMAD Silent Cutter</title><style>body{background:#060708;color:#f2f3f6;font:17px/1.9 Tahoma,Arial,sans-serif;max-width:960px;margin:40px auto;padding:24px}pre{font:inherit;white-space:pre-wrap}</style><h1>AGMAD Silent Cutter</h1><pre>'+html.escape(readme)+'</pre></html>',encoding='utf-8')
- (dest/'START_HERE.txt').write_text('AGMAD Silent Cutter '+(ROOT/'VERSION').read_text()+'\nأغلق النسخة القديمة، وفك ضغط الحزمة بالكامل، ثم افتح Install.cmd.\nافتح README_AR.html للتعليمات العربية.\nالأدوات والنماذج والنتائج السابقة تبقى محفوظة.\n',encoding='utf-8-sig')
- shutil.copy2(ROOT/'LICENSE',dest/'LICENSE');shutil.copy2(ROOT/'docs/VALIDATION.md',dest/'VALIDATION.md')
+ (dest/'START_HERE.txt').write_text('AGMAD Silent Cutter '+version+'\nأغلق النسخة القديمة، وفك ضغط الحزمة بالكامل، ثم افتح Install.cmd.\nافتح README_AR.html للتعليمات العربية.\nالأدوات والنماذج والنتائج السابقة تبقى محفوظة.\n',encoding='utf-8-sig')
+ shutil.copy2(ROOT/'LICENSE',dest/'LICENSE');shutil.copy2(args.validation or ROOT/'docs/VALIDATION.md',dest/'VALIDATION.md')
  archive=dest.with_name(dest.name+'.zip')
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
   for item in sorted(dest.rglob('*')):
