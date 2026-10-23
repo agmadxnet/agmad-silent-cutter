@@ -45,3 +45,13 @@ Run `python3 scripts/make_icons.py` with Pillow installed. Mac additionally uses
 ## Release checksums
 
 Generate SHA256SUMS for the final ZIP/DMG/source artifacts, verify ZIP CRCs, and record file sizes/hashes in the release manifest. Do not rebuild after approving those hashes without repeating approval. Do not commit runtimes, installed environments, models, recordings or logs to Git.
+
+## Local Windows 1.5.1 candidate
+
+Keep public VERSION unchanged. Package the port with the existing verified runtime and candidate-specific Arabic instructions/validation:
+
+```sh
+python3 scripts/package_windows.py --output /fresh/output/folder --runtime /path/to/verified/runtime --version 1.5.1_Test --readme docs/WINDOWS_1.5.1_TEST.ar.md --validation docs/WINDOWS_1.5.1_VALIDATION.md
+```
+
+Optional --version/--readme/--validation leave the default stable packaging workflow intact. Package build-info records the selected candidate version while retaining the upstream runtime provenance. Native Windows installation/playback and cleanup validation remain required before public release.
