@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.1 — prepared, publication pending
+## 1.5.1 — published with owner approval
 
 - AV1 cleanup compatibility correction; owner-reported long Mac recording passed.
 - PNG watermark position/size/opacity and independent Cutting Off.

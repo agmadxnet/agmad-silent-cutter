@@ -46,3 +46,9 @@ The accepted Mac features are ported to the Arabic Windows interface: PNG waterm
 ## Windows 1.5.1 test accepted
 
 The owner reported “done test passed” for the delivered Windows 1.5.1_Test package. Detailed device, mode and long-recording results were not supplied; this is owner-reported acceptance, not an independently observed native test. Both Mac and Windows 1.5.1 candidates now have owner test confirmation. Preserve the tested packages and their recorded checksums. Public release remains 1.4.0; preparing release notes and a reviewed publication bundle is next, with explicit approval required before GitHub/site publication.
+
+## 1.5.1 publication completed
+
+Owner explicitly approved GitHub publication and the agmad.net update after both platform tests passed. PR #1 merged the complete 100-file reviewed source snapshot. Immutable v1.5.1 points to c15cf068cc053ebc9e6e381d92751c211e9abf94. All 12 published attachments were re-downloaded and SHA-256/size matched against the frozen reviewed files. Mac/Windows installers are unchanged. GitHub source, Mac build/signature and Windows runtime jobs passed on the reviewed branch; both PR and push checks were green before merge. The previous 1.4.0 release and tag remain available.
+
+The existing EN/AR product templates and only the Silent Cutter record in content.js were updated from fresh backups. Saved editor files match prepared text; anonymous pages serve verified 1.5.1 links. Canonical/hreflang and rendered noindex policy remain; home/projects templates and other project records were unchanged. EN/AR language switching, 390px layout without horizontal overflow and screenshot loading passed. Evidence is retained in the owner workspace work/release151/PUBLICATION.json. Source/tag and attached preparation-time records remain immutable; current branch documentation records publication.
