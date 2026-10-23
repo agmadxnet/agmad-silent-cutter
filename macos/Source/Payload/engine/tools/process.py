@@ -100,11 +100,13 @@ def cleaned_source(source, mode, temp, log, notify):
         finally:
             if os.path.exists(staging):
                 os.unlink(staging)
-    prepared = temp / 'prepared.mov'
+    prepared = temp / 'prepared.mkv'
+    # Matroska accepts copied AV1/VP9 as well as H.264 with lossless FLAC audio.
+    # MOV rejects AV1 at header writing, even when a re-encoded test excerpt succeeds.
     # Stream-copy picture: the final Auto-Editor render is the only video encoding pass.
     # Input timestamps are rebased together; only the cleaned first audio track is retained.
     run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', source, '-i', cache,
-         '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'pcm_s16le',
+         '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'flac',
          '-map_metadata', '-1', prepared], log)
     return prepared
 
