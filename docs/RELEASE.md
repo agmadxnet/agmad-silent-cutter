@@ -1,11 +1,13 @@
 # Release preparation — 1.4.0
 
+> Historical record: preparation and test statements below describe their original stage, not current availability. Version [1.5.1 is published as a stable release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08. Test results and untested areas remain as recorded; release assets and tags are unchanged.
+
 Public repository and pre-release approved and published on 20 October 2026:
 
 - https://github.com/agmadxnet/agmad-silent-cutter
 - https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0
 
-All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The browser session was used because connector/CLI write access was unavailable. The checklist below remains the release procedure; public GitHub steps are complete, and the bilingual production website rollout completed on 20 October 2026. The owner confirmed Medhat completed the requested Windows 1.4.0 test on 22 October 2026. See [website deployment](WEBSITE_RELEASE.md).
+All 78 source files matched the reviewed local Git blobs before tagging. Seven public release downloads matched approved SHA-256 values. The checks below summarize reproducible release verification; public GitHub steps are complete, and the bilingual production website rollout completed on 20 October 2026. The owner confirmed the Windows tester completed the requested Windows 1.4.0 test on 22 October 2026. See [website deployment](WEBSITE_RELEASE.md).
 
 ## Prepared
 
@@ -16,21 +18,16 @@ All 78 source files matched the reviewed local Git blobs before tagging. Seven p
 - CI definitions, issue/PR templates, build scripts and focused regression tests.
 - Bilingual noindex website preview and narrowly scoped Studio integration overlay.
 
-## Final review before sharing
+## Reproducible release checks
 
-1. Review the visual change and prepared MIT source license. Confirm the repository owner/name and whether source should be public; third-party licenses remain independent.
-2. Test a short normal recording with the styled Mac and Windows packages. The owner already accepted the 1.3 workflow; Medhat's requested Windows 1.4.0 test was confirmed complete by the owner on 22 October 2026.
-3. Review version, minimum OS, optional download sizes/signing disclosures, LICENSES and source links. No Developer ID, notarization or Windows publisher signature is claimed. If a signed mainstream distribution is required, complete the owner's signing setup before release.
-4. Freeze exact artifact SHA-256 and file sizes from RELEASE_MANIFEST.json. Upload only those installers, source archive and SHA256SUMS; never upload the workspace or installed environments/models.
-5. Publish the reviewed repository and a GitHub release. Use the app source tag `v1.4.0` only for the reviewed commit; do not assume locally built artifacts are automatically reproducible bit-for-bit.
-6. Verify public release/source URLs and re-download/hash the assets. CI must actually run before claiming a green build.
-7. Fill website/release.json with the verified URLs and enable BOTH localized download links. Review/apply only the existing project route overlay, then check downloads, language navigation, canonical/hreflang and robots. Do not deploy an old full Studio snapshot over current editorial work.
-8. Update candidate wording/indexing only after the downloads are live and explicit publication approval is given. Keep other products' release states unchanged.
-
-Rollback: retain previous 1.3 DMG/ZIP and the pre-deployment project templates/content. Replacing the app or restoring the page does not delete result folders or managed engines. Do not remove existing user settings/cache as part of rollback.
+- Preserve source and third-party license notices, signing disclosures, minimum OS and dependency requirements.
+- Build using [BUILD.md](BUILD.md); do not assume independently built packages reproduce published binaries bit for bit.
+- Record artifact SHA-256 and file sizes in a manifest. Verify downloaded assets against the published checksums.
+- Run CI before claiming a passing build; distinguish source checks, native runtime tests and user-reported acceptance.
+- Keep previous releases and user settings, engines, models and outputs intact when updating or rolling back.
 
 ## GitHub checks reviewed 22 October 2026
 
 [Latest reviewed run](https://github.com/agmadxnet/agmad-silent-cutter/actions/runs/39464427700): source regression tests and native Mac build/signature verification passed. The Windows job was cancelled before execution because GitHub could not acquire a hosted runner. This is not a passed Windows check; rerun it when runner capacity is available. No installer or release tag was changed.
 
-Stable promotion approved by the owner on 22 October 2026 after Medhat’s Windows test. Existing tested installers, release tag, checksums and attached build-time records remain unchanged. Current documentation records later acceptance; attached source/validation/manifest files retain their historical build-time state.
+Stable promotion approved by the owner on 22 October 2026 after the native Windows test. Existing tested installers, release tag, checksums and attached build-time records remain unchanged. Current documentation records later acceptance; attached source/validation/manifest files retain their historical build-time state.

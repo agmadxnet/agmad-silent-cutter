@@ -1,5 +1,7 @@
 # Mac 1.5.0 watermark test build
 
+> Historical record: preparation and test statements below describe their original stage, not current availability. Version [1.5.1 is published as a stable release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08. Test results and untested areas remain as recorded; release assets and tags are unchanged.
+
 Status: local Mac test package. No public release, Windows build or site update.
 
 ## Use
@@ -21,4 +23,4 @@ The AV1 cleanup compatibility fix from 1.4.1 is retained. Playback-speed control
 
 ## Validation
 
-Real exports check 0/25/100% opacity and a transparent PNG combined with 50% opacity, expected pixel position/brightness, unchanged comparison duration, invalid-value rejection and temporary-directory cleanup after success. Existing cutting/cleanup regression tests remain enabled. Native UI smoke checks exercise the sheet, sliders and placement bounds; full native app export checks load both linked players. See the owner workspace work/watermark150 for test captures and exact results. No long branded production recording or native Windows watermark test is claimed.
+Real exports check 0/25/100% opacity and a transparent PNG combined with 50% opacity, expected pixel position/brightness, unchanged comparison duration, invalid-value rejection and temporary-directory cleanup after success. Existing cutting/cleanup regression tests remain enabled. Native UI smoke checks exercise the sheet, sliders and placement bounds; full native app export checks load both linked players. Test captures and exact results were retained separately. No long branded production recording or native Windows watermark test is claimed.

@@ -1,5 +1,7 @@
 # Windows 1.5.1 local test candidate
 
+> Historical record: preparation and test statements below describe their original stage, not current availability. Version [1.5.1 is published as a stable release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08. Test results and untested areas remain as recorded; release assets and tags are unchanged.
+
 This candidate ports the accepted Mac 1.5.1 controls to the existing Arabic Qt Windows interface. It includes the AV1 cleanup-container correction, session-only PNG watermark placement/opacity, Cutting Off, flat MP4-only exports and four filename styles with an optional prefix. Public release remains 1.4.0; no live download or release tag was changed.
 
 ## Checks performed on macOS
@@ -14,9 +16,9 @@ The new adapters retain Windows cooperative cancellation and child-tree handling
 
 ## Required native follow-up
 
-The Windows installer, Windows Qt playback/backend, actual taskkill child-tree behavior and fresh model execution were not run on this Mac. Medhat must test installation and the Arabic checklist in README_AR.html, including the long recording, before approval for a public Windows release. Existing installed tools/models/settings are reused; test outputs do not validate every codec, hardware configuration or external drive.
+The Windows installer, Windows Qt playback/backend, actual taskkill child-tree behavior and fresh model execution were not run on this Mac. The Windows tester must test installation and the Arabic checklist in README_AR.html, including the long recording, before approval for a public Windows release. Existing installed tools/models/settings are reused; test outputs do not validate every codec, hardware configuration or external drive.
 
-Local package hashes and verification results are recorded in the owner workspace work/windows151/VALIDATION.json. ZIP SHA-256 is also supplied beside the ZIP. This is an unsigned local test package, not a signed Windows publisher build.
+Local package hashes and verification results were retained separately. ZIP SHA-256 is also supplied beside the ZIP. This is an unsigned local test package, not a signed Windows publisher build.
 
 ## Owner test confirmation
 

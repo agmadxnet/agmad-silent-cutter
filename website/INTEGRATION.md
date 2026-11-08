@@ -1,6 +1,6 @@
-# agmad.net integration — deployed 20 October 2026
+# agmad.net integration
 
-The live product pages are https://agmad.net/projects/silent-cutter/ and https://agmad.net/projects/silent-cutter/?lang=ar. Both serve verified 1.4.0 pre-release download links. See [deployment scope and validation](../docs/WEBSITE_RELEASE.md).
+Checked 2026-11-08: the [English product page](https://agmad.net/projects/silent-cutter/) and [Arabic product page](https://agmad.net/projects/silent-cutter/?lang=ar) return HTTP 200 and link to the published stable 1.5.1 downloads. This verifies page availability and link targets, not installer execution or downloaded checksums. See [deployment scope and validation](../docs/WEBSITE_RELEASE.md).
 
 The instructions below describe the preparation procedure for future updates; fetch current production files before using the historical overlay script.
 
@@ -21,6 +21,6 @@ Before applying, fetch the CURRENT production templates/content/runtime and diff
 
 Do not replace disabled links with local filesystem paths or invent a download counter, testimonial or signing claim. The public app remains free of a required account; there is no subscription/entitlement change.
 
-## Stable promotion
+## Historical 1.4.0 promotion
 
-Owner approved on 22 October 2026 following Medhat’s Windows test. Current fragments/release.json describe stable 1.4.0. Keep the existing indexing policy and all download files unchanged.
+Owner approved on 22 October 2026 following the native Windows test. At that stage, fragments/release.json described stable 1.4.0; current metadata describes 1.5.1. Keep the existing indexing policy and all download files unchanged.

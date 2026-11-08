@@ -20,7 +20,7 @@ Originals remain intact. New MP4s go directly into the chosen folder; processing
 - [Windows ZIP](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Windows_1.5.1.zip)
 - [Source archive](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/Agmad_Silent_Cutter_Source_1.5.1.zip) · [SHA256SUMS](https://github.com/agmadxnet/agmad-silent-cutter/releases/download/v1.5.1/SHA256SUMS)
 
-All 12 release attachments were re-downloaded and checksum verified. The [English product page](https://agmad.net/projects/silent-cutter/) and [الصفحة العربية](https://agmad.net/projects/silent-cutter/?lang=ar) are updated. [1.4.0 remains available](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0). The immutable v1.5.1 source/tag and attachments retain preparation-time wording; this branch records completed publication.
+The original publication record reports that all 12 release attachments were re-downloaded and checksum verified. A 2026-11-08 check confirmed the stable release metadata, attachment names and live product-page link targets; binary checksum and runtime tests were not repeated. The [English product page](https://agmad.net/projects/silent-cutter/) and [الصفحة العربية](https://agmad.net/projects/silent-cutter/?lang=ar) are updated. [1.4.0 remains available](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.4.0). The immutable v1.5.1 source/tag and attachments retain preparation-time wording; this branch records completed publication.
 
 ## Install
 
