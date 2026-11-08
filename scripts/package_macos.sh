@@ -10,19 +10,25 @@ if [ -e "$output/$name.dmg" ] || [ -e "$output/$name.zip" ]; then
   echo 'Choose a fresh output directory; existing releases are preserved.' >&2
   exit 1
 fi
+python3 "$root/scripts/check_release_docs.py" "$root/docs/PACKAGE_MAC.md" "$root/docs/VALIDATION.md" "$root/LICENSE" "$root/THIRD_PARTY_NOTICES.md"
 stage="$(mktemp -d /tmp/agmad-cutter-release.XXXXXX)"
 trap 'rm -rf "$stage"' EXIT
 payload="$stage/$name"
 mkdir -p "$payload"
 AGMAD_BUILD_OUTPUT="$payload/Agmad Silent Cutter.app" bash "$root/macos/Source/build.command"
-cp "$root/docs/MAC.md" "$payload/README.md"
+cp "$root/docs/PACKAGE_MAC.md" "$payload/README.md"
 cp "$root/docs/VALIDATION.md" "$payload/VALIDATION.md"
 cp "$root/LICENSE" "$payload/LICENSE"
 cp "$root/THIRD_PARTY_NOTICES.md" "$payload/THIRD_PARTY_NOTICES.md"
+python3 "$root/scripts/check_release_docs.py" "$payload"
 ln -s /Applications "$payload/Applications"
 xattr -cr "$payload"
 codesign --verify --deep --strict "$payload/Agmad Silent Cutter.app"
 hdiutil create -volname 'AGMAD Silent Cutter' -fs HFS+ -srcfolder "$payload" -format UDZO "$output/$name.dmg"
 hdiutil verify "$output/$name.dmg"
 ditto -c -k --norsrc --noextattr --noqtn --keepParent "$payload" "$output/$name.zip"
+if ! python3 "$root/scripts/check_release_docs.py" "$output/$name.zip"; then
+  rm -f "$output/$name.zip" "$output/$name.dmg"
+  exit 1
+fi
 printf 'Created: %s\n' "$output/$name.dmg" "$output/$name.zip"

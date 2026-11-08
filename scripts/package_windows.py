@@ -1,6 +1,7 @@
 """Build Windows package with a verified existing runtime or locked official downloads."""
 import argparse,hashlib,html,json,re,shutil,urllib.request,zipfile
 from pathlib import Path
+from check_release_docs import check_paths
 ROOT=Path(__file__).resolve().parents[1]
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def unpack(source,destination):
@@ -17,8 +18,11 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--runtime',type=Path);ap.add_argument('--version');ap.add_argument('--readme',type=Path);ap.add_argument('--validation',type=Path);args=ap.parse_args()
  version=args.version or (ROOT/'VERSION').read_text().strip();
  if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:_Test)?',version):raise ValueError('Invalid package version')
+ readme_path=args.readme or ROOT/'docs/PACKAGE_WINDOWS.ar.md'
+ validation_path=args.validation or ROOT/'docs/VALIDATION.md'
+ check_paths([readme_path,validation_path,ROOT/'LICENSE',ROOT/'windows/THIRD_PARTY_NOTICES.md'])
  dest=args.output/f'Agmad_Silent_Cutter_Windows_{version}'
- if dest.exists():raise ValueError('Output exists; choose a fresh build folder')
+ if dest.exists() or dest.with_name(dest.name+'.zip').exists() or dest.with_name(dest.name+'.zip.sha256').exists():raise ValueError('Output exists; choose a fresh build folder')
  shutil.copytree(ROOT/'windows',dest,ignore=shutil.ignore_patterns('__pycache__','*.pyc','runtime','.DS_Store'))
  info_path=dest/'assets/build-info.json';info=json.loads(info_path.read_text());info['app_version']=version;info_path.write_text(json.dumps(info,indent=2)+'\n')
  runtime=dest/'runtime';expected=json.loads((ROOT/'windows/assets/runtime-sha256.json').read_text())
@@ -41,16 +45,20 @@ def main():
   item=runtime/name
   if name=='python313._pth':continue
   if not item.is_file() or digest(item)!=sha:raise ValueError('Runtime file mismatch: '+name)
- readme=(args.readme or ROOT/'docs/WINDOWS.ar.md').read_text(encoding='utf-8');(dest/'README_AR.md').write_text(readme,encoding='utf-8')
+ readme=readme_path.read_text(encoding='utf-8');(dest/'README_AR.md').write_text(readme,encoding='utf-8')
  (dest/'README_AR.html').write_text('<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>AGMAD Silent Cutter</title><style>body{background:#060708;color:#f2f3f6;font:17px/1.9 Tahoma,Arial,sans-serif;max-width:960px;margin:40px auto;padding:24px}pre{font:inherit;white-space:pre-wrap}</style><h1>AGMAD Silent Cutter</h1><pre>'+html.escape(readme)+'</pre></html>',encoding='utf-8')
  (dest/'START_HERE.txt').write_text('AGMAD Silent Cutter '+version+'\nأغلق النسخة القديمة، وفك ضغط الحزمة بالكامل، ثم افتح Install.cmd.\nافتح README_AR.html للتعليمات العربية.\nالأدوات والنماذج والنتائج السابقة تبقى محفوظة.\n',encoding='utf-8-sig')
- shutil.copy2(ROOT/'LICENSE',dest/'LICENSE');shutil.copy2(args.validation or ROOT/'docs/VALIDATION.md',dest/'VALIDATION.md')
+ shutil.copy2(ROOT/'LICENSE',dest/'LICENSE');shutil.copy2(validation_path,dest/'VALIDATION.md')
+ check_paths([dest])
  archive=dest.with_name(dest.name+'.zip')
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
   for item in sorted(dest.rglob('*')):
    if item.is_file() and '__pycache__' not in item.parts and item.suffix!='.pyc':z.write(item,item.relative_to(dest.parent))
  with zipfile.ZipFile(archive) as z:
   if z.testzip():raise ValueError('ZIP integrity failure')
+ try:check_paths([archive])
+ except (ValueError,UnicodeError):
+  archive.unlink();raise
  archive.with_name(archive.name+'.sha256').write_text(digest(archive)+'  '+archive.name+'\n')
  print(archive)
 if __name__=='__main__':main()

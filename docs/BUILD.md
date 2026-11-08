@@ -46,7 +46,7 @@ Run `python3 scripts/make_icons.py` with Pillow installed. Mac additionally uses
 
 Generate SHA256SUMS for the final ZIP/DMG/source artifacts, verify ZIP CRCs, and record file sizes/hashes in the release manifest. Do not rebuild after approving those hashes without repeating approval. Do not commit runtimes, installed environments, models, recordings or logs to Git.
 
-## Local Windows 1.5.1 candidate
+## Historical Windows 1.5.1 candidate
 
 Keep public VERSION unchanged. Package the port with the existing verified runtime and candidate-specific Arabic instructions/validation:
 
@@ -55,3 +55,26 @@ python3 scripts/package_windows.py --output /fresh/output/folder --runtime /path
 ```
 
 Optional --version/--readme/--validation leave the default stable packaging workflow intact. Package build-info records the selected candidate version while retaining the upstream runtime provenance. Native Windows installation/playback and cleanup validation remain required before public release.
+
+## Documentation checks for future packages
+
+Build from a reviewed checkout containing the cleaned documentation. Mac packages use `docs/PACKAGE_MAC.md`; Windows packages use `docs/PACKAGE_WINDOWS.ar.md` and generate both Markdown and HTML from that one source. The older version-specific guides remain historical records. Custom Windows `--readme` and `--validation` inputs are checked before runtime downloads or output staging. Both packagers check staged documentation and the completed ZIP; the Mac DMG uses the same checked staging folder.
+
+The read-only documentation gate blocks the targeted personal attribution and private home/workspace references. It never redacts files, changes licenses, or edits existing releases. If required third-party attribution triggers a check, review the licensing requirement; do not remove legally required credits. This targeted check is not a general secret scanner or a substitute for human review. Standard per-user application storage paths and generic build placeholders remain documented.
+
+Run the same check on any additional release notes, manifests, website bundles or custom package documents before distributing them:
+
+```sh
+python3 scripts/check_release_docs.py README.md README.ar.md STATUS.md CHANGELOG.md docs website
+python3 scripts/check_release_docs.py /path/to/new/package.zip /path/to/new/release-notes.md
+```
+
+Create future source packages with:
+
+```sh
+python3 scripts/package_source.py --output /fresh/output/folder
+```
+
+This uses the resolved HEAD commit and that commit's VERSION, preserves tracked source/licenses, checks the archive's documentation and writes a new ZIP plus SHA-256 file. Uncommitted files are not included. Commit and review intended documentation updates first; verify the printed commit before release. Existing filenames are refused rather than replaced. Manually assembled archives must pass the same documentation gate.
+
+For a new release, update and review the guides and dated validation evidence for that version. Historical acceptance does not validate a newly built installer. Never rebuild, replace or delete existing published assets or move tags as part of documentation maintenance.
