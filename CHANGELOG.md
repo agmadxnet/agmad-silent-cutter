@@ -1,5 +1,7 @@
 # Changelog
 
+Entries preserve the status at the time recorded. Version [1.5.1 is currently published as stable](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08; the earlier 1.4.0 candidate wording is historical (that release was later promoted to stable).
+
 ## 1.5.1 — published with owner approval
 
 - AV1 cleanup compatibility correction; owner-reported long Mac recording passed.

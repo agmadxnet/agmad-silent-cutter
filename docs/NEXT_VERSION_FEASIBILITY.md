@@ -1,5 +1,7 @@
 # Proposed additions after the compatibility fix
 
+> Historical feasibility note. PNG watermarking shipped in 1.5.1; exported playback speed, selected clips and vertical reframing remain proposals, not available features or release commitments. The isolated technical results below do not establish product readiness.
+
 Status: feasibility assessed; not implemented in the app.
 
 ## Keep the existing default workflow
@@ -21,12 +23,5 @@ Manual Mark start / Mark end controls, a named range list, and Export selected c
 ## Technical checks completed
 
 Using installed FFmpeg: positioned 25% white overlay on black measured RGB 64/64/64; 1.25x export changed 6 seconds to 4.833 seconds with audio/video present; two selected 1.5-second ranges exported separately. These isolated demonstrations validate engine capability, not finished UI or combined-feature performance.
-
-## Order
-
-1. Validate the 1.4.1 compatibility fix on the reported recording.
-2. Branding plus uniform playback speed in optional export controls.
-3. Clip range selection and separate exports.
-4. Consider vertical crop only after the clip workflow is accepted.
 
 Scope excludes a multitrack editor, effects timeline and automated highlight detection. Keep every added control optional and preserve originals and prior results.

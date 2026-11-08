@@ -1,5 +1,7 @@
 # Mac 1.5.1 test build — Cutting Off and video-only exports
 
+> Historical record: preparation and test statements below describe their original stage, not current availability. Version [1.5.1 is published as a stable release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08. Test results and untested areas remain as recorded; release assets and tags are unchanged.
+
 Owner reported this Mac 1.5.1 test working on 22 October 2026. Detailed per-option results were not supplied. This remains a local test build, not a public release or Windows update. Retains the 1.4.1 AV1 compatibility fix and 1.5.0 PNG watermark controls. The owner reported the watermark test working before this update.
 
 ## Cutting Off
@@ -25,6 +27,6 @@ Existing filenames are never overwritten. Name/date collisions add `_002`, `_003
 
 ## Validation
 
-Seventeen automated checks cover existing cut/cleanup/watermark behavior, Unicode/naming options, overlapping serial exports, source-file protection, copy-failure and cancellation cleanup, flat destination contents, internal report paths, true no-cut renders without Auto-Editor on PATH, cleanup plus Off, watermark plus Off, and normal silence cutting. Native app checks cover Off controls and exports/linked playback. Package-specific results and hashes are in the owner workspace work/export151/VALIDATION.json. No native Windows update is included.
+Seventeen automated checks cover existing cut/cleanup/watermark behavior, Unicode/naming options, overlapping serial exports, source-file protection, copy-failure and cancellation cleanup, flat destination contents, internal report paths, true no-cut renders without Auto-Editor on PATH, cleanup plus Off, watermark plus Off, and normal silence cutting. Native app checks cover Off controls and exports/linked playback. Package-specific results and hashes were retained separately. No native Windows update is included.
 
 Install: quit Silent Cutter, open the DMG and drag the app to Applications. Existing settings/tools/results are retained. Start with a 30-second test. Apple Silicon/macOS 14+, ad-hoc signed and not Apple-notarized.

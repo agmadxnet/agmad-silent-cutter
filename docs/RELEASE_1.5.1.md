@@ -1,6 +1,6 @@
-# AGMAD Silent Cutter 1.5.1 — proposed release
+# AGMAD Silent Cutter 1.5.1 — release notes
 
-Status: prepared for owner review; not published. Public release remains 1.4.0.
+Status: [published stable release](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1), verified 2026-11-08. The release lists 12 attachments, including Mac DMG/ZIP, Windows ZIP, source and SHA256SUMS. Historical preparation records inside the unchanged assets may retain pre-release wording.
 
 ## What changes
 
@@ -25,12 +25,6 @@ The Mac app is ad-hoc signed, not Apple-notarized. Windows has no publisher sign
 
 Cutting Off still encodes to H.264/AAC; it is not lossless passthrough. Watermarking adds a video encoding pass and temporary disk use. Noise/music separation can leave artifacts and may not repair severe wind distortion. Single-file GUI processing remains; no batch queue, exported playback-speed control, automatic highlights, Shorts range selection or vertical reframing is included.
 
-## Proposed publication scope
+## Downloads and verification
 
-1. Publish only the reviewed source snapshot to agmadxnet/agmad-silent-cutter and create v1.5.1 against the verified matching source commit. Do not move the existing v1.4.0 tag.
-2. Upload the exact reviewed Mac DMG/ZIP, Windows ZIP, source ZIP, release notes, validation, manifest and SHA256SUMS. Set 1.5.1 as the latest stable release only with owner approval.
-3. Re-download and hash every public asset before enabling the corresponding website links. Proposed URLs in the preparation bundle are unverified until then.
-4. Fetch current production files, then update only the existing English/Arabic Silent Cutter product pages, their download/version metadata and existing project badge if needed. Preserve navigation, other products, the journal article and current indexing policy. Do not deploy a historical full-site snapshot.
-5. Retain 1.4.0 installers, release/tag and a fresh backup of changed live page files. Rollback points the product-page downloads back to 1.4.0; it does not remove user settings, engines, models or outputs.
-
-No GitHub or WordPress mutation is authorized by preparation alone. Review bundle: outputs/Agmad_Silent_Cutter_Release_1.5.1_Review in the owner workspace.
+Use the [release page](https://github.com/agmadxnet/agmad-silent-cutter/releases/tag/v1.5.1) for versioned downloads and SHA256SUMS. Verify downloaded bytes against those published checksums. The 2026-11-08 documentation audit checked release metadata and live English/Arabic product-page links; it did not repeat the original binary checksum or runtime tests. Version 1.4.0 remains available. See [status](../STATUS.md) for the historical publication record.
