@@ -4,6 +4,8 @@ Local video silence cutting, optional voice cleanup and PNG watermarking for Mac
 
 **1.5.1 stable — published with owner approval.** The owner reports the delivered Mac and Windows 1.5.1 tests passed. See [release notes](docs/RELEASE_1.5.1.md) and [validation](docs/WINDOWS_1.5.1_VALIDATION.md) for evidence and limits.
 
+[Project page and downloads](https://agmad.net/projects/silent-cutter/) · [Silent Cutter story on AGMAD Substack](https://agmadstudio.substack.com/p/agmad-silent-cutter-a-careful-first)
+
 ## Workflow
 
 1. Choose a video and output folder.
